@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.html": "cpp"
+    },
+    "git.ignoreLimitWarning": true,
+    "C_Cpp.errorSquiggles": "disabled"
+}
