@@ -32,7 +32,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <ArduinoJson.h>
 
 // Display handlers
-#include <tftscreen.h>
+#include <display.h>
 
 // Time handling library
 #include <ESP32Time.h>
@@ -55,7 +55,7 @@ void updateTime() {
     if(now > last) {
         last = now;
         snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
-        setMeter(SCR_GNSS, TIME, buf);
+        setMeter(SCR_GNSS, GNSS_TIME, buf);
     }
 }
 
@@ -169,12 +169,9 @@ void handlePGN(tN2kMsg& msg) {
                 record["sog"] = dpf(msToKnots(sog), 1);
             }
             if(s && hdg != N2kDoubleNA) {
-                setMeter(SCR_NAV, HDG, RadToDeg(hdg), "°");
+                setMeter(SCR_NAV, COG, RadToDeg(hdg), "°");
                 record["cog"] = (int)RadToDeg(hdg);
             }
-
- 
-
         } break;
 
         case 128267: {
@@ -225,7 +222,7 @@ void handlePGN(tN2kMsg& msg) {
                 char buf[10];
                 snprintf(buf, 9, "%02d:%02d:%02d", hours, minutes, seconds);
 
-                setMeter(SCR_GNSS, HDOP, Hdop, "");
+                setMeter(SCR_GNSS, GNSS_HDOP, Hdop, "");
 
                 record["lat"] = Latitude;
                 record["lon"] = Longitude;
@@ -257,36 +254,6 @@ void handlePGN(tN2kMsg& msg) {
             // date and time
             // Ignore this as we use the values in PGN129029
         }  break;
-
-        case 129540: {
-            // GNSS satellites in view
-
-            unsigned char instance;
-            tN2kRangeResidualMode Mode;
-            uint8_t NumberOfSVs;
-
-            // First get the number of satellites in view
-            bool s = ParseN2kPGN129540(msg, instance, Mode, NumberOfSVs);
-
-            initGNSSSky(NumberOfSVs);
-            initGNSSSignal(NumberOfSVs);
-            // Now for each satellite index get the details
-            for (int i = 0; i < NumberOfSVs; i++) {
-                tSatelliteInfo SatelliteInfo;
-
-                s = ParseN2kPGN129540(msg, i, SatelliteInfo);
-/*                Console->printf("RET %d Sat %d PRN %d AZ %f EL %f SNR %f\n", s, i, SatelliteInfo.PRN,
-                                RadToDeg(SatelliteInfo.Azimuth), RadToDeg(SatelliteInfo.Elevation),
-                                SatelliteInfo.SNR);
-*/                                
-                setGNSSSignal(i, SatelliteInfo.SNR);
-                setGNSSSky(i, RadToDeg(SatelliteInfo.Azimuth), RadToDeg(SatelliteInfo.Elevation));
-                
-            }
-
-            setMeter(SCR_GNSS, SATS, (double)NumberOfSVs, "");
-
-        } break;
 
         case 130310: {
             // Outside Environmental

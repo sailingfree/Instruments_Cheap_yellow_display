@@ -4,8 +4,6 @@
 
 #include <WebServer.h>
 
-#include <tftscreen.h>
-
 #include <StringStream.h>
 
 #include <sdcard.h>
@@ -86,11 +84,11 @@ void webServerSetup(void) {
     server.begin(80);
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("Web server started");
-        displayText("Web Server started");
+//        displayText("Web Server started");
 
         server.addHandler(new uriHandler());
 
-         // This works for a POST with a content encoding of text/plain though application/json also appears to work
+        // This works for a POST with a content encoding of text/plain though application/json also appears to work
         // The result ends up in a header called plain.
         // The file to write to is on the command line as ?file=filename
         server.on("/", HTTP_POST, []() {

@@ -27,7 +27,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 // Display
-#include <tftscreen.h>
+#include <display.h>
 
 // WiFI handling
 #include <MyWiFi.h>
@@ -58,25 +58,23 @@ void setup() {
 
 
     adminSetup();          // Should be called first to setup preferences etc
-    metersSetup();         // Graphics setup
+    setup_display();         // Graphics setup
     wifiSetup(host_name);  // Conect to an AP for the YD data
     webServerSetup();      // remote management
-    displayText("Web server started...");
-    sdcard_setup();
-    setup_logging();
+//    displayText("Web server started...");
+//    sdcard_setup();
+//    setup_logging();
     // Finally load the first working screen
-    loadScreen();
+//    loadScreen();
     Serial.println("Setup done...");
 }
 
 // loop calling the work functions
 void loop(void) {
-
     adminWork();
     wifiWork();
     webServerWork();
-    metersWork();
     wifiCheck();
-    updateTime();
-    delay(50);
+//    updateTime();    
+    metersWork();
 }

@@ -29,10 +29,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <StringStream.h>
 #include <YDtoN2KUDP.h>
 #include <handlePGN.h>
-#include <tftscreen.h>
-
 #include <map>
-
 #include <sdcard.h>
 #include <SdFat.h>
 #include <SysInfo.h>
@@ -86,7 +83,7 @@ bool connectWifi() {
             StringStream s;
             s.printf("\nTrying %s\n", wifiCreds[i].ssid.c_str());
             Serial.print(s.data);
-            displayText((char*)s.data.c_str());
+//            displayText((char*)s.data.c_str());
             WiFi.disconnect();
             WiFi.mode(WIFI_OFF);
             WiFi.mode(WIFI_STA);
@@ -111,13 +108,13 @@ bool connectWifi() {
                 WifiIP = WiFi.localIP().toString();
                 Console->printf("Connected to %s\n", wifiCreds[i].ssid.c_str());
                 hadconnection = true;
-                setilabel(SCR_ENGINE, WifiIP);
-                setilabel(SCR_NAV, WifiIP);
+//                setilabel(SCR_ENGINE, WifiIP);
+//                setilabel(SCR_NAV, WifiIP);
                 String msg("AP: ");
                 msg += wifiCreds[i].ssid;
                 msg += "\nIP: ";
                 msg += WifiIP;
-                displayText((char*)msg.c_str());
+//                displayText((char*)msg.c_str());
                 return true;
             }
             else {
@@ -154,7 +151,7 @@ void wifiCheck() {
 // Register services we use
 void wifiSetup(String& host_name) {
     Serial.println("Starting WiFi manager task...");
-    displayText("Starting WiFi...");
+//    displayText("Starting WiFi...");
 
     uint32_t retries = 5;
 
@@ -174,7 +171,7 @@ void wifiSetup(String& host_name) {
 
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Failed to connect to WiFi please check creds");
-        displayText("Can't connect to wifi please check creds");
+//        displayText("Can't connect to wifi please check creds");
     }
     else {
         Serial.println("WiFi connected..!");

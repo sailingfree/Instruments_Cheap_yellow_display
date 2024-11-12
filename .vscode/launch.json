@@ -18,8 +18,8 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "c:/Users/peter/Nextcloud/PlatformIO/Projects/Instruments_Cheap_yellow_display/.pio/build/esp32dev/firmware.elf",
-            "projectEnvName": "esp32dev",
+            "executable": "c:/Users/peter/Nextcloud/PlatformIO/Projects/Instruments_Cheap_yellow_display/.pio/build/esp32-2432S028R/firmware.elf",
+            "projectEnvName": "esp32-2432S028R",
             "toolchainBinDir": "C:/Users/peter/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
@@ -31,8 +31,8 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "c:/Users/peter/Nextcloud/PlatformIO/Projects/Instruments_Cheap_yellow_display/.pio/build/esp32dev/firmware.elf",
-            "projectEnvName": "esp32dev",
+            "executable": "c:/Users/peter/Nextcloud/PlatformIO/Projects/Instruments_Cheap_yellow_display/.pio/build/esp32-2432S028R/firmware.elf",
+            "projectEnvName": "esp32-2432S028R",
             "toolchainBinDir": "C:/Users/peter/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart"
         },
@@ -40,8 +40,8 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "c:/Users/peter/Nextcloud/PlatformIO/Projects/Instruments_Cheap_yellow_display/.pio/build/esp32dev/firmware.elf",
-            "projectEnvName": "esp32dev",
+            "executable": "c:/Users/peter/Nextcloud/PlatformIO/Projects/Instruments_Cheap_yellow_display/.pio/build/esp32-2432S028R/firmware.elf",
+            "projectEnvName": "esp32-2432S028R",
             "toolchainBinDir": "C:/Users/peter/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "loadMode": "manual"
