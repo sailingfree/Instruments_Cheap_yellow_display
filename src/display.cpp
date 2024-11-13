@@ -20,6 +20,7 @@ static Indicator* ind[SCR_MAX][12];
 static InfoBar* bars[SCR_MAX];
 static lv_obj_t* gauges[SCR_MAX];
 static lv_obj_t* needles[SCR_MAX];
+static Meter* meters[SCR_MAX];
 
 // Constructor. Binds to the parent object.
 Indicator::Indicator(lv_obj_t* parent, const char* name, uint32_t x, uint32_t y) {
@@ -35,13 +36,14 @@ Indicator::Indicator(lv_obj_t* parent, const char* name, uint32_t x, uint32_t y)
     lv_obj_set_layout(container, LV_LAYOUT_FLEX);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_COLUMN);
     lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_pad_gap(container, 0, 0);
 
     label = lv_label_create(container);
     lv_label_set_text(label, name);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
 
     lv_style_init(&text_style);
-    lv_style_set_text_font(&text_style, &RobotoCondensedVariableFont_wght8);
+    lv_style_set_text_font(&text_style, &RobotoCondensedVariableFont_wght16);
     lv_obj_add_style(label, &text_style, 0);
 
     text = lv_label_create(container);
@@ -130,9 +132,59 @@ MenuBar::MenuBar(lv_obj_t* parent, uint32_t y) {
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
 }
 
+// simple meter 
+Meter::Meter(lv_obj_t* parent, const lv_image_dsc_t* img, uint32_t w, uint32_t h, uint32_t min, uint32_t max, uint32_t start, uint32_t end) {
+    Serial.printf("Creating Meter %d %d %d %d %d %d\n",
+        w, h, min, max, start, end);
+    width = w;
+    height = h;
+    static lv_style_t style;
+    static lv_style_t needleStyle;
+    lv_style_init(&style);
+    container = lv_obj_create(parent);
+    lv_obj_remove_flag(container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(container, w, h);
+    lv_style_set_pad_all(&style, 0);
+    lv_obj_add_style(container, &style, 0);
+
+    imgObj = lv_image_create(container);
+    lv_img_set_src(imgObj, img);
+    lv_obj_set_size(imgObj, w - 5, h - 5);
+    needle = lv_line_create(imgObj);
+    lv_style_init(&needleStyle);
+    lv_style_set_line_width(&needleStyle, 8);
+    lv_style_set_line_color(&needleStyle, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_line_rounded(&needleStyle, true);
+    lv_obj_add_style(needle, & needleStyle, 0);
+    origx = width / 2;
+    origy = height / 2;
+}
+
+void Meter::setVal(uint32_t v) {
+    Serial.printf("Setting meter value %d\n");
+    points[0].x = origx;
+    points[0].y = origy;
+    points[1].x = origx + 50;
+    points[1].y = origy - 50;
+    lv_line_set_points(needle, points, 2);
+    Serial.printf("NEEDLE %d %d %d %d\n", points[0].x,
+    points[0].y,
+    points[1].x,
+    points[1].y);
+}
+
+
+void Meter::setPos(int x, int y) {
+    lv_obj_set_pos(container, x, y);
+}
+
+
 static void buttonHandler(lv_event_t* e) {
     void* target = lv_event_get_user_data(e);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
     Screens s = reinterpret_cast<Screens&>(target);
+#pragma GCC diagnostic pop
     lv_event_code_t code = lv_event_get_code(e);
 
     if (code == LV_EVENT_PRESSED) {
@@ -266,20 +318,22 @@ static lv_obj_t* createContainer(lv_obj_t* cont) {
     return container;
 }
 
-lv_obj_t * createNavScreen() {
+lv_obj_t* createNavScreen() {
     lv_obj_t* screen = lv_obj_create(NULL);
 
     setupCommonstyles(screen);
     setupHeader(SCR_NAV, screen, "Nav");
 
-    ind[SCR_NAV][SOG] = new Indicator(screen, "HouseV", COL1, ROW1);
-    ind[SCR_NAV][DEPTH] = new Indicator(screen, "HouseI", COL1, ROW2);
-    ind[SCR_NAV][COG] = new Indicator(screen, "EngineV", COL1, ROW3);
- 
-     // Create a container for a gauge for the Wind
+    ind[SCR_NAV][NAV_SOG] = new Indicator(screen, "SOG", COL1, ROW1);
+    ind[SCR_NAV][NAV_COG] = new Indicator(screen, "COG", COL1, ROW2);
+    ind[SCR_NAV][DEPTH] = new Indicator(screen, "Depth", COL1, ROW3);
+
+#if USE_SCALE
+    // Create a container for a gauge for the Wind
     lv_obj_t* container = createContainer(screen);
-    lv_obj_set_size(container, (TFT_WIDTH / 2) - 2 * padding, (TFT_HEIGHT / 2) - 2 * padding);
-    lv_obj_set_pos(container, COL2, ROW2);
+
+    lv_obj_set_size(container, (TFT_WIDTH / 2) - 2 * padding, BODY_HEIGHT - 2 * padding);
+    lv_obj_set_pos(container, COL2, ROW1);
     lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
 
     static lv_style_t style;
@@ -287,7 +341,10 @@ lv_obj_t * createNavScreen() {
 
     // Scale for the wind direction
     lv_obj_t* scale = lv_scale_create(container);
-    lv_obj_set_size(scale, (TFT_WIDTH / 2) - (2 * padding) - (2 * border), (TFT_HEIGHT / 2) - (2 * padding) - (2 * border));
+    int32_t  width = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
+    int32_t  height = width;
+
+    lv_obj_set_size(scale, width, height);
     lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
     lv_obj_set_style_bg_opa(scale, LV_OPA_80, 0);
     lv_obj_set_style_bg_color(scale, lv_color_black(), 0);
@@ -312,7 +369,7 @@ lv_obj_t * createNavScreen() {
     lv_style_init(&indicator_style);
 
     /* Label style properties */
-    lv_style_set_text_font(&indicator_style, &RobotoCondensedVariableFont_wght24);
+    lv_style_set_text_font(&indicator_style, &RobotoCondensedVariableFont_wght12);
     lv_style_set_text_color(&indicator_style, lv_palette_main(LV_PALETTE_YELLOW));
 
     /* Major tick properties */
@@ -338,26 +395,31 @@ lv_obj_t * createNavScreen() {
     lv_obj_set_style_line_color(needle, lv_palette_main(LV_PALETTE_RED), 0);
 
     // Label in the dial
-    const char * lab = "App Wind";
-    lv_obj_t * label = lv_label_create(scale);
+    const char* lab = "App Wind";
+    lv_obj_t* label = lv_label_create(scale);
     lv_label_set_text(label, lab);
 
-    lv_obj_set_style_text_font(label, &RobotoCondensedVariableFont_wght24, 0);
+    lv_obj_set_style_text_font(label, &RobotoCondensedVariableFont_wght12, 0);
     lv_obj_set_style_text_color(label, lv_palette_main(LV_PALETTE_YELLOW), 0);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-    uint32_t w = lv_text_get_width(lab, strlen(lab), &RobotoCondensedVariableFont_wght24, 1);
-    lv_obj_set_pos(label,TFT_WIDTH /4 - (w /2), TFT_HEIGHT / 3);
+    uint32_t w = lv_text_get_width(lab, strlen(lab), &RobotoCondensedVariableFont_wght12, 1);
+    lv_obj_set_pos(label, TFT_WIDTH / 4 - (w / 2), TFT_HEIGHT / 3);
 
-       // Save the scale line and image for updates
+    // Save the scale line and image for updates
     gauges[SCR_NAV] = scale;
     needles[SCR_NAV] = needle;
 
+    // set an initial value
+    setGauge(SCR_NAV, 0.0);
+#else
+
+#endif
     setupMenu(screen);
     return screen;
 
 }
 
-lv_obj_t * createEngineScreen() {
+lv_obj_t* createEngineScreen() {
     lv_obj_t* screen = lv_obj_create(NULL);
 
     setupCommonstyles(screen);
@@ -366,13 +428,94 @@ lv_obj_t * createEngineScreen() {
     ind[SCR_ENGINE][HOUSEV] = new Indicator(screen, "HouseV", COL1, ROW1);
     ind[SCR_ENGINE][HOUSEI] = new Indicator(screen, "HouseI", COL1, ROW2);
     ind[SCR_ENGINE][ENGINEV] = new Indicator(screen, "EngineV", COL1, ROW3);
- 
+#if USE_SCALE
+    // Create a container for a gauge
+    lv_obj_t* container = createContainer(screen);
+    lv_obj_set_size(container, (TFT_WIDTH / 2) - 2 * padding, BODY_HEIGHT - 2 * padding);
+    lv_obj_set_pos(container, COL2, ROW1);
+    lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
+
+    // Meter for the RPM
+    lv_obj_t* scale = lv_scale_create(container);
+    int32_t  width = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
+    int32_t  height = width;
+
+    lv_obj_set_size(scale, width, height);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+    lv_obj_set_style_bg_opa(scale, LV_OPA_80, 0);
+    lv_obj_set_style_bg_color(scale, lv_color_black(), 0);
+    lv_obj_set_style_radius(scale, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_clip_corner(scale, true, 0);
+    lv_obj_center(scale);
+
+    static lv_style_t indicator_style;
+    lv_style_init(&indicator_style);
+
+    /* Label style properties */
+    lv_style_set_text_font(&indicator_style, &RobotoCondensedVariableFont_wght24);
+    lv_style_set_text_color(&indicator_style, lv_palette_main(LV_PALETTE_YELLOW));
+
+    /* Major tick properties */
+    lv_style_set_line_color(&indicator_style, lv_palette_main(LV_PALETTE_YELLOW));
+    lv_style_set_length(&indicator_style, 8); /* tick length */
+    lv_style_set_line_width(&indicator_style, 2); /* tick width */
+    lv_obj_add_style(scale, &indicator_style, LV_PART_INDICATOR);
+
+    static const char* rpm_ticks[] = { "0", "5", "10", "15", "20", "25", "30", "35" };
+    lv_scale_set_text_src(scale, rpm_ticks);
+    lv_scale_set_label_show(scale, true);
+    lv_scale_set_total_tick_count(scale, 31);
+    lv_scale_set_major_tick_every(scale, 5);
+
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
+    lv_scale_set_range(scale, 1, 3500);
+
+    lv_scale_set_angle_range(scale, 270);
+    lv_scale_set_rotation(scale, 135);
+
+    static lv_style_t scale_style;
+    lv_style_init(&scale_style);
+    lv_style_set_line_width(&scale_style, 6);
+
+    lv_obj_add_style(scale, &scale_style, LV_PART_ANY);
+
+    lv_obj_t* needle = lv_image_create(scale);
+    needle = lv_line_create(scale);
+    lv_obj_set_style_line_width(needle, 5, 0);
+    lv_obj_set_style_line_rounded(needle, true, 0);
+    lv_obj_set_style_line_color(needle, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_scale_set_line_needle_value(scale, needle, 50, 10);
+
+    // Label in the dial
+    const char* lab = "RPM x100";
+    lv_obj_t* label = lv_label_create(scale);
+    lv_label_set_text(label, lab);
+
+    lv_obj_set_style_text_font(label, &RobotoCondensedVariableFont_wght12, 0);
+    lv_obj_set_style_text_color(label, lv_palette_main(LV_PALETTE_YELLOW), 0);
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
+    uint32_t w = lv_text_get_width(lab, strlen(lab), &RobotoCondensedVariableFont_wght12, 1);
+    lv_obj_set_pos(label, TFT_WIDTH / 4 - (w / 2), TFT_HEIGHT / 3);
+
+    // Save the scale line and image for updates
+    gauges[SCR_ENGINE] = scale;
+    needles[SCR_ENGINE] = needle;
+    setGauge(SCR_ENGINE, 0.0);
+#else 
+    LV_IMG_DECLARE(rpm);
+    uint32_t w = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
+    uint32_t h = w;
+    meters[SCR_ENGINE] = new Meter(screen, &rpm, w, h, 0, 30, 180 + 45, 90 + 45);
+    meters[SCR_ENGINE]->setPos(TFT_WIDTH / 2, BAR_HEIGHT);
+    meters[SCR_ENGINE]->setVal(1000);
+#endif
     setupMenu(screen);
     return screen;
 
 }
 
-lv_obj_t * createEnvScreen() {
+lv_obj_t* createEnvScreen() {
     lv_obj_t* screen = lv_obj_create(NULL);
 
     setupCommonstyles(screen);
@@ -381,11 +524,11 @@ lv_obj_t * createEnvScreen() {
     ind[SCR_ENV][AIRTEMP] = new Indicator(screen, "Air Temp", COL1, ROW1);
     ind[SCR_ENV][HUM] = new Indicator(screen, "Humidity", COL1, ROW2);
     ind[SCR_ENV][PRESSURE] = new Indicator(screen, "Pressure", COL1, ROW3);
-    ind[SCR_ENV][SEATEMP] = new Indicator(screen, "Air Temp", COL1, ROW1);
-    ind[SCR_ENV][WINDSP] = new Indicator(screen, "Humidity", COL1, ROW2);
-    ind[SCR_ENV][WINDANGLE] = new Indicator(screen, "Pressure", COL1, ROW3);
- 
- 
+    ind[SCR_ENV][SEATEMP] = new Indicator(screen, "Air Temp", COL2, ROW1);
+    ind[SCR_ENV][WINDSP] = new Indicator(screen, "Humidity", COL2, ROW2);
+    ind[SCR_ENV][WINDANGLE] = new Indicator(screen, "Pressure", COL2, ROW3);
+
+
     setupMenu(screen);
     return screen;
 
@@ -400,7 +543,7 @@ lv_obj_t* createGnssScreen() {
     ind[SCR_GNSS][GNSS_HDOP] = new Indicator(screen, "HDOP", COL1, ROW1);
     ind[SCR_GNSS][GNSS_SATS] = new Indicator(screen, "Sats", COL2, ROW1);
     ind[SCR_GNSS][GNSS_LAT] = new Indicator(screen, "LAT", COL1, ROW2);
-    ind[SCR_GNSS][GNSS_LONG] = new Indicator(screen, "LON", COL2, ROW2);
+    ind[SCR_GNSS][GNSS_LON] = new Indicator(screen, "LON", COL2, ROW2);
     ind[SCR_GNSS][GNSS_SOG] = new Indicator(screen, "SOG Kts", COL1, ROW3);
     ind[SCR_GNSS][GNSS_COG] = new Indicator(screen, "COG deg", COL2, ROW3);
 
@@ -437,12 +580,12 @@ void setup_display() {
     }
     // Create the screens
     screens[SCR_ENGINE] = createEngineScreen();
-    screens[SCR_NAV] = createNavScreen();    
+    screens[SCR_NAV] = createNavScreen();
     screens[SCR_GNSS] = createGnssScreen();
     screens[SCR_ENV] = createEnvScreen();
     screens[SCR_SYSINFO] = createSysInfoScreen();
 
-    lv_scr_load(screens[SCR_GNSS]);
+    lv_scr_load(screens[SCR_ENGINE]);
 }
 
 // Update a value using double and optional units
@@ -468,8 +611,59 @@ void metersWork(void) {
     delay(tick_delay);
 }
 
-void setMeter(Screens, MeterIdx, double, const char * units) {}
-void setMeter(int scr, int ind, char *) {}
-void setGauge(int scr, double) {}
-void setVlabel(int, String &) {}
-void setilabel(int scr, String &) {}
+// Set the value of a meter using a double and precision of 2
+void setMeter(Screens scr, MeterIdx idx, double value, const char* units) {
+    setMeter(scr, idx, value, units, 2);
+}
+
+// Set the value of a meter using a double and set the precision
+// Uses the indicator's method which smooths the values
+void setMeter(Screens scr, MeterIdx idx, double value, const char* units, uint32_t prec) {
+    if (scr >= 0 && scr < SCR_MAX && ind[scr][idx]) {
+        ind[scr][idx]->setValue(value, units, prec);
+    }
+}
+
+void setGauge(Screens scr, double value) {
+    if (scr >= 0 && scr < SCR_MAX && gauges[scr] && needles[scr]) {
+        lv_scale_set_line_needle_value(gauges[scr], needles[scr], TFT_WIDTH, (int32_t)value);
+        metersWork();
+    }
+}
+
+// Set the value of a meter using a string
+void setMeter(Screens scr, MeterIdx idx, String& string) {
+    if (scr >= 0 && scr < SCR_MAX && ind[scr][idx]) {
+        ind[scr][idx]->setValue(string.c_str());
+    }
+}
+
+// set using a char *
+void setMeter(Screens scr, MeterIdx idx, const char* str) {
+    if (scr >= 0 && scr < SCR_MAX && ind[scr][idx]) {
+        ind[scr][idx]->setValue(str);
+    }
+}
+
+// Update the time displayed on the screen.
+// Uses the internal system time which will have been updated
+// if the GPS has provided a clock.
+// Only update if the seconds have changed
+void updateTime() {
+    static time_t last = 0;
+    struct tm tm;
+    char buf[10];
+    time_t now = time(NULL);
+    gmtime_r(&now, &tm);
+
+    if (now > last) {
+        last = now;
+        snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+        setMeter(SCR_GNSS, GNSS_TIME, buf);
+        bars[SCR_ENGINE]->setTime(buf);
+        bars[SCR_NAV]->setTime(buf);
+        bars[SCR_GNSS]->setTime(buf);
+        bars[SCR_ENV]->setTime(buf);
+        bars[SCR_SYSINFO]->setTime(buf);
+    }
+}

@@ -40,23 +40,17 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <time.h>
 
 static  ESP32Time rtc;
+// Function to convert lat/lon in decimal degrees to DMM
+// Returns a reference to a static char string
+const char * decimalDegDMM(double angle) {
+    static const int len = 32;
+    static char buf[len];
+    double deg, fractional, mm;
 
-// Update the time displayed on the screen.
-// Uses the internal system time which will have been updated
-// if the GPS has provided a clock.
-// Only update if the seconds have changed
-void updateTime() {
-    static time_t last = 0;
-    struct tm tm;
-    char buf[10];
-    time_t now = time(NULL);
-    gmtime_r(&now, &tm);
-
-    if(now > last) {
-        last = now;
-        snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
-        setMeter(SCR_GNSS, GNSS_TIME, buf);
-    }
+    fractional = modf(angle, &deg);
+    mm = fractional * 60.0;
+    snprintf(buf, len - 1, "%.0lf°%.3f", deg, mm);
+    return buf;
 }
 
 // Function to return a String objcet formatted to a fixed number of decimal places
@@ -131,7 +125,7 @@ void handlePGN(tN2kMsg& msg) {
                 setGauge(SCR_ENGINE, speed / 100);
                 String es(speed, 0);
                 es += "rpm";
-                setVlabel(SCR_ENGINE, es);
+//                setVlabel(SCR_ENGINE, es);
                 record["rpm"] = (int)speed / 100;
             }
         } break;
@@ -145,7 +139,7 @@ void handlePGN(tN2kMsg& msg) {
             bool s = ParseN2kPGN130306(msg, instance, windSpeed, windAngle, ref);
             String ws(msToKnots(windSpeed));
             ws += "kts";
-            setVlabel(SCR_NAV, ws);
+//            setVlabel(SCR_NAV, ws);
             if(s && windAngle != N2kDoubleNA) {
                 setGauge(SCR_NAV, (int)RadToDeg(windAngle) + 180);
                 setMeter(SCR_ENV, WINDANGLE, RadToDeg(windAngle), "°");
@@ -165,11 +159,13 @@ void handlePGN(tN2kMsg& msg) {
             double sog;
             bool s = ParseN2kPGN129026(msg, instance, ref, hdg, sog);
             if(s && sog != N2kDoubleNA) {
-                setMeter(SCR_NAV, SOG, msToKnots(sog), "kts");
+                setMeter(SCR_NAV, NAV_SOG, msToKnots(sog), "kts");
+                setMeter(SCR_GNSS, GNSS_SOG, msToKnots(sog), "kts");
                 record["sog"] = dpf(msToKnots(sog), 1);
             }
             if(s && hdg != N2kDoubleNA) {
-                setMeter(SCR_NAV, COG, RadToDeg(hdg), "°");
+                setMeter(SCR_NAV, NAV_COG, RadToDeg(hdg), "°");
+                setMeter(SCR_GNSS, GNSS_COG, RadToDeg(hdg), "°");
                 record["cog"] = (int)RadToDeg(hdg);
             }
         } break;
@@ -222,7 +218,13 @@ void handlePGN(tN2kMsg& msg) {
                 char buf[10];
                 snprintf(buf, 9, "%02d:%02d:%02d", hours, minutes, seconds);
 
+                String latStr(Latitude,5);
+                String lonStr(Longitude,5);
+                String sats(nSatellites);
                 setMeter(SCR_GNSS, GNSS_HDOP, Hdop, "");
+                setMeter(SCR_GNSS, GNSS_SATS, sats);
+                setMeter(SCR_GNSS, GNSS_LAT, decimalDegDMM(Latitude));
+                setMeter(SCR_GNSS, GNSS_LON, decimalDegDMM(Longitude));
 
                 record["lat"] = Latitude;
                 record["lon"] = Longitude;

@@ -75,6 +75,6 @@ void loop(void) {
     wifiWork();
     webServerWork();
     wifiCheck();
-//    updateTime();    
+    updateTime();    
     metersWork();
 }

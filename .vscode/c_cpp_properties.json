@@ -1070,7 +1070,6 @@
                 "CDS=34",
                 "BOARD_HAS_SPEAK",
                 "SPEAK=26",
-                "CORE_DEBUG_LEVEL=ARDUHAL_LOG_LEVEL_DEBUG",
                 "TFT_WIDTH=DISPLAY_HEIGHT",
                 "TFT_HEIGHT=DISPLAY_WIDTH",
                 "LV_COLOR_16_SWAP=1",

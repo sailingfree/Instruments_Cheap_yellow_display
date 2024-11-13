@@ -33,5 +33,3 @@ extern Stream *Console;
 // Main message handler
 void handlePGN(tN2kMsg &msg);
 
-// Time display update
-void updateTime();

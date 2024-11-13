@@ -1,6 +1,12 @@
 {
     "files.associations": {
-        "*.html": "cpp"
+        "*.html": "cpp",
+        "array": "c",
+        "bitset": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "regex": "c",
+        "utility": "c"
     },
     "git.ignoreLimitWarning": true,
     "C_Cpp.errorSquiggles": "disabled"

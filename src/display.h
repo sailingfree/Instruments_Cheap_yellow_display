@@ -5,6 +5,9 @@
 #include <lvgl.h>
 #include <StringStream.h>
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 #define HEIGH_IND   (TFT_HEIGHT/4)
 #define HEIGHT_INFO (TFT_HEIGHT/8)
 
@@ -52,16 +55,16 @@ typedef enum {
     ENGINEV = 2,
 
     // Indexes for the nav info screen
-    SOG = 0,
+    NAV_SOG = 0,
     DEPTH = 1,
-    COG = 2,
+    NAV_COG = 2,
 
     // Indexes for the GNSS screen
     GNSS_SATS = 0,
     GNSS_HDOP = 1,
     GNSS_TIME = 2,
     GNSS_LAT,
-    GNSS_LONG,
+    GNSS_LON,
     GNSS_SOG,
     GNSS_COG,
 
@@ -143,17 +146,35 @@ typedef struct Buttons {
     const char * label;
 }Buttons;
 
+// Class for a lightweight meter
+class Meter {
+    public:
+    Meter(lv_obj_t * parent, const lv_image_dsc_t *, uint32_t w, uint32_t h, uint32_t min, uint32_t max, uint32_t start, uint32_t end);
+    void setPos(int x, int y);
+    void setVal(uint32_t v);
+    lv_obj_t * lvObj() {return container;}
 
+    private:
+        lv_obj_t * container;
+        lv_obj_t * imgObj;
+        lv_obj_t * needle;
+        int width,height;
+        lv_point_precise_t  points[2];
+        int origx, origy;
+};
 
 void setup_display();
 void display_write(MeterIdx obj, double value, const char * units, uint32_t precision);
 void display_write(MeterIdx obj, const char * value);
 void updateTime(StringStream t);
 void metersWork(void);
-void setMeter(Screens, MeterIdx, double, const char * units);
-void setMeter(int scr, int ind, char *);
-void setGauge(int scr, double);
-void setVlabel(int, String &);
-void setilabel(int scr, String &);
+void setMeter(Screens scr, MeterIdx ind, double, const char *, uint32_t prec = 2);
+void setMeter(Screens scr, MeterIdx ind, const char *);
+void setMeter(Screens scr, MeterIdx ind, String & val);
+void setGauge(Screens scr, double);
+void setVlabel(Screens, String &);
+void setilabel(Screens scr, String &);
 void loadScreen();
 void displayText(const char *);
+// Time display update
+void updateTime();
