@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Canvas Gauges Example - Node-RED uibuilder</title>
+    <meta name="description" content="Node-RED uibuilder - Canvas Gauges Example">
+    <link rel="icon" href="./images/node-blue.ico">
+
+    <!-- Your own CSS (defaults to loading uibuilders css)-->
+    <link type="text/css" rel="stylesheet" href="./index.css" media="all">
+
+    <!-- #region Supporting Scripts. These MUST be in the right order. Note no leading / - socket.io no longer needed  -->
+    <script defer src="../uibuilder/uibuilder.iife.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/canvas-gauges@2.1.7/gauge.min.js"></script>
+    <script defer src="./index.js">/* OPTIONAL: Put your custom code in that */</script>
+    <script defer src="./wind.js">/* OPTIONAL: Put your custom code in that */</script>
+    <!-- #endregion -->
+
+</head><body class="uib">
+    
+    <h1>uibuilder Canvas Gauges Example</h1>
+
+    <div id="more"><!-- '#more' is used as a parent for dynamic HTML content in examples --></div>
+
+    <canvas id="gauge-radial-1"></canvas>
+
+    <pre id="msg" class="syntax-highlight">Waiting for a message from Node-RED</pre>
+
+    <a id="download" download="image.png"><button type="button" onClick="download()">Download</button></a>
+</body></html>
+
