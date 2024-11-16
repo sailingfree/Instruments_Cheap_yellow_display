@@ -10,6 +10,7 @@
 #include <NMEA0183Messages.h>
 #include <N2kMsg.h>
 #include <map>
+#include <Meter.h>
 
 static const uint32_t border = 1, padding = 0;
 
@@ -130,52 +131,6 @@ MenuBar::MenuBar(lv_obj_t* parent, uint32_t y) {
 
     lv_obj_set_layout(container, LV_LAYOUT_FLEX);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
-}
-
-// simple meter 
-Meter::Meter(lv_obj_t* parent, const lv_image_dsc_t* img, uint32_t w, uint32_t h, uint32_t min, uint32_t max, uint32_t start, uint32_t end) {
-    Serial.printf("Creating Meter %d %d %d %d %d %d\n",
-        w, h, min, max, start, end);
-    width = w;
-    height = h;
-    static lv_style_t style;
-    static lv_style_t needleStyle;
-    lv_style_init(&style);
-    container = lv_obj_create(parent);
-    lv_obj_remove_flag(container, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_size(container, w, h);
-    lv_style_set_pad_all(&style, 0);
-    lv_obj_add_style(container, &style, 0);
-
-    imgObj = lv_image_create(container);
-    lv_img_set_src(imgObj, img);
-    lv_obj_set_size(imgObj, w - 5, h - 5);
-    needle = lv_line_create(imgObj);
-    lv_style_init(&needleStyle);
-    lv_style_set_line_width(&needleStyle, 8);
-    lv_style_set_line_color(&needleStyle, lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_line_rounded(&needleStyle, true);
-    lv_obj_add_style(needle, & needleStyle, 0);
-    origx = width / 2;
-    origy = height / 2;
-}
-
-void Meter::setVal(uint32_t v) {
-    Serial.printf("Setting meter value %d\n");
-    points[0].x = origx;
-    points[0].y = origy;
-    points[1].x = origx + 50;
-    points[1].y = origy - 50;
-    lv_line_set_points(needle, points, 2);
-    Serial.printf("NEEDLE %d %d %d %d\n", points[0].x,
-    points[0].y,
-    points[1].x,
-    points[1].y);
-}
-
-
-void Meter::setPos(int x, int y) {
-    lv_obj_set_pos(container, x, y);
 }
 
 
@@ -506,9 +461,9 @@ lv_obj_t* createEngineScreen() {
     LV_IMG_DECLARE(rpm);
     uint32_t w = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
     uint32_t h = w;
-    meters[SCR_ENGINE] = new Meter(screen, &rpm, w, h, 0, 30, 180 + 45, 90 + 45);
+    meters[SCR_ENGINE] = new Meter(screen, &rpm, w, h, 0.0, 30.0, 270.0, -135.0);
     meters[SCR_ENGINE]->setPos(TFT_WIDTH / 2, BAR_HEIGHT);
-    meters[SCR_ENGINE]->setVal(1000);
+    meters[SCR_ENGINE]->setVal(0);
 #endif
     setupMenu(screen);
     return screen;
@@ -655,6 +610,8 @@ void updateTime() {
     char buf[10];
     time_t now = time(NULL);
     gmtime_r(&now, &tm);
+    static float rpm = 0;
+    static float delta = 1;
 
     if (now > last) {
         last = now;
@@ -665,5 +622,12 @@ void updateTime() {
         bars[SCR_GNSS]->setTime(buf);
         bars[SCR_ENV]->setTime(buf);
         bars[SCR_SYSINFO]->setTime(buf);
+        meters[SCR_ENGINE]->setVal(rpm);
+        rpm = rpm + delta;
+        if(rpm >= 30) {
+            delta = -1;
+        } else if(rpm < 0) {
+            delta = 1;
+        }
     }
 }

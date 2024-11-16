@@ -28,7 +28,7 @@
 #define COL2            (TFT_WIDTH / 2)
 
 class Txt {
-    public:
+public:
     uint16_t x;
     uint16_t y;
     uint16_t w;
@@ -92,89 +92,74 @@ typedef enum {
 // on an ESP32 or similar.
 // It has a fixed size.
 class Indicator {
-   public:
+public:
     // Constructor:
-    Indicator(lv_obj_t *parent, const char *label, uint32_t x, uint32_t y);
-    void setValue(const char *value);
+    Indicator(lv_obj_t* parent, const char* label, uint32_t x, uint32_t y);
+    void setValue(const char* value);
 
     // Set the value of a meter using a double and set the precision
     void setValue(double value, const char* units, uint32_t prec);
-    
+
     //Change the main indicator font
-    void setFont(const lv_font_t *value);
+    void setFont(const lv_font_t* value);
 
     // private:
-    lv_obj_t *container;
-    lv_obj_t *label;
-    lv_obj_t *text;
+    lv_obj_t* container;
+    lv_obj_t* label;
+    lv_obj_t* text;
 
     lv_style_t text_style;
     lv_style_t value_style;
     lv_style_t style;
 
     // The interval used for moving averages
-    static const int interval = 4;  
+    static const int interval = 4;
 };
 
 // Class to implement a full width info text area. 
 class InfoBar {
-    public:
-    InfoBar(lv_obj_t * parent, uint32_t y);
-    void setValue(const char * value);
-    void setTime(const char * t);
+public:
+    InfoBar(lv_obj_t* parent, uint32_t y);
+    void setValue(const char* value);
+    void setTime(const char* t);
 
     bool isActive;
 
-    lv_obj_t * container;
-    lv_obj_t * text;
-    lv_obj_t * curTime;
+    lv_obj_t* container;
+    lv_obj_t* text;
+    lv_obj_t* curTime;
 };
 
 
 class MenuBar {
-    public:
-    MenuBar(lv_obj_t * parent, uint32_t y);
+public:
+    MenuBar(lv_obj_t* parent, uint32_t y);
 
-    void addButton(const char * label, Screens target);
-    lv_obj_t *  addActionButton(const char * label, void (*ptr)(lv_event_t *));
-    lv_obj_t * container;
+    void addButton(const char* label, Screens target);
+    lv_obj_t* addActionButton(const char* label, void (*ptr)(lv_event_t*));
+    lv_obj_t* container;
 };
 
 typedef struct Buttons {
     BTN btn;
     Screens target;
-    const char * label;
+    const char* label;
 }Buttons;
 
-// Class for a lightweight meter
-class Meter {
-    public:
-    Meter(lv_obj_t * parent, const lv_image_dsc_t *, uint32_t w, uint32_t h, uint32_t min, uint32_t max, uint32_t start, uint32_t end);
-    void setPos(int x, int y);
-    void setVal(uint32_t v);
-    lv_obj_t * lvObj() {return container;}
 
-    private:
-        lv_obj_t * container;
-        lv_obj_t * imgObj;
-        lv_obj_t * needle;
-        int width,height;
-        lv_point_precise_t  points[2];
-        int origx, origy;
-};
 
 void setup_display();
-void display_write(MeterIdx obj, double value, const char * units, uint32_t precision);
-void display_write(MeterIdx obj, const char * value);
+void display_write(MeterIdx obj, double value, const char* units, uint32_t precision);
+void display_write(MeterIdx obj, const char* value);
 void updateTime(StringStream t);
 void metersWork(void);
-void setMeter(Screens scr, MeterIdx ind, double, const char *, uint32_t prec = 2);
-void setMeter(Screens scr, MeterIdx ind, const char *);
-void setMeter(Screens scr, MeterIdx ind, String & val);
+void setMeter(Screens scr, MeterIdx ind, double, const char*, uint32_t prec = 2);
+void setMeter(Screens scr, MeterIdx ind, const char*);
+void setMeter(Screens scr, MeterIdx ind, String& val);
 void setGauge(Screens scr, double);
-void setVlabel(Screens, String &);
-void setilabel(Screens scr, String &);
+void setVlabel(Screens, String&);
+void setilabel(Screens scr, String&);
 void loadScreen();
-void displayText(const char *);
+void displayText(const char*);
 // Time display update
 void updateTime();
