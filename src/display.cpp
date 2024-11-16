@@ -266,13 +266,6 @@ static void setupMenu(lv_obj_t* screen) {
     menuBar->addButton("Info", SCR_SYSINFO);
 }
 
-// create a container for a gauge or other display object
-// setting styles etc
-static lv_obj_t* createContainer(lv_obj_t* cont) {
-    lv_obj_t* container = lv_obj_create(cont);
-    return container;
-}
-
 lv_obj_t* createNavScreen() {
     lv_obj_t* screen = lv_obj_create(NULL);
 
@@ -283,92 +276,13 @@ lv_obj_t* createNavScreen() {
     ind[SCR_NAV][NAV_COG] = new Indicator(screen, "COG", COL1, ROW2);
     ind[SCR_NAV][DEPTH] = new Indicator(screen, "Depth", COL1, ROW3);
 
-#if USE_SCALE
-    // Create a container for a gauge for the Wind
-    lv_obj_t* container = createContainer(screen);
+ //   LV_IMG_DECLARE(wind);
+ //   uint32_t w = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
+ //   uint32_t h = w;
+ //   meters[SCR_NAV] = new Meter(screen, &wind, w, h, 0.0, 359, 360, 0.0);
+ //   meters[SCR_NAV]->setPos(TFT_WIDTH / 2, BAR_HEIGHT);
+ //   meters[SCR_NAV]->setVal(45);
 
-    lv_obj_set_size(container, (TFT_WIDTH / 2) - 2 * padding, BODY_HEIGHT - 2 * padding);
-    lv_obj_set_pos(container, COL2, ROW1);
-    lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
-
-    static lv_style_t style;
-    lv_style_init(&style);
-
-    // Scale for the wind direction
-    lv_obj_t* scale = lv_scale_create(container);
-    int32_t  width = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
-    int32_t  height = width;
-
-    lv_obj_set_size(scale, width, height);
-    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
-    lv_obj_set_style_bg_opa(scale, LV_OPA_80, 0);
-    lv_obj_set_style_bg_color(scale, lv_color_black(), 0);
-    lv_obj_set_style_radius(scale, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_clip_corner(scale, true, 0);
-    lv_obj_center(scale);
-
-    lv_scale_set_label_show(scale, true);
-
-    lv_scale_set_total_tick_count(scale, 61);
-    lv_scale_set_major_tick_every(scale, 5);
-
-
-    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
-    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
-
-    lv_scale_set_range(scale, 0, 360);
-    lv_scale_set_angle_range(scale, 360);
-    lv_scale_set_rotation(scale, 270);
-
-    static lv_style_t indicator_style;
-    lv_style_init(&indicator_style);
-
-    /* Label style properties */
-    lv_style_set_text_font(&indicator_style, &RobotoCondensedVariableFont_wght12);
-    lv_style_set_text_color(&indicator_style, lv_palette_main(LV_PALETTE_YELLOW));
-
-    /* Major tick properties */
-    lv_style_set_line_color(&indicator_style, lv_palette_main(LV_PALETTE_YELLOW));
-    lv_style_set_length(&indicator_style, 8); /* tick length */
-    lv_style_set_line_width(&indicator_style, 2); /* tick width */
-    lv_obj_add_style(scale, &indicator_style, LV_PART_INDICATOR);
-
-    static const char* compass_ticks[] = {
-                "", "30", "60", "90", "120", "150", "180", "210", "240", "270", "300", "330", "360" };
-    lv_scale_set_text_src(scale, compass_ticks);
-
-    static lv_style_t scale_style;
-    lv_style_init(&scale_style);
-    lv_style_set_line_width(&scale_style, 6);
-
-    lv_obj_add_style(scale, &scale_style, LV_PART_ANY);
-    lv_obj_t* needle = lv_line_create(scale);
-
-
-    lv_obj_set_style_line_width(needle, 5, 0);
-    lv_obj_set_style_line_rounded(needle, true, 0);
-    lv_obj_set_style_line_color(needle, lv_palette_main(LV_PALETTE_RED), 0);
-
-    // Label in the dial
-    const char* lab = "App Wind";
-    lv_obj_t* label = lv_label_create(scale);
-    lv_label_set_text(label, lab);
-
-    lv_obj_set_style_text_font(label, &RobotoCondensedVariableFont_wght12, 0);
-    lv_obj_set_style_text_color(label, lv_palette_main(LV_PALETTE_YELLOW), 0);
-    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-    uint32_t w = lv_text_get_width(lab, strlen(lab), &RobotoCondensedVariableFont_wght12, 1);
-    lv_obj_set_pos(label, TFT_WIDTH / 4 - (w / 2), TFT_HEIGHT / 3);
-
-    // Save the scale line and image for updates
-    gauges[SCR_NAV] = scale;
-    needles[SCR_NAV] = needle;
-
-    // set an initial value
-    setGauge(SCR_NAV, 0.0);
-#else
-
-#endif
     setupMenu(screen);
     return screen;
 
@@ -383,88 +297,14 @@ lv_obj_t* createEngineScreen() {
     ind[SCR_ENGINE][HOUSEV] = new Indicator(screen, "HouseV", COL1, ROW1);
     ind[SCR_ENGINE][HOUSEI] = new Indicator(screen, "HouseI", COL1, ROW2);
     ind[SCR_ENGINE][ENGINEV] = new Indicator(screen, "EngineV", COL1, ROW3);
-#if USE_SCALE
-    // Create a container for a gauge
-    lv_obj_t* container = createContainer(screen);
-    lv_obj_set_size(container, (TFT_WIDTH / 2) - 2 * padding, BODY_HEIGHT - 2 * padding);
-    lv_obj_set_pos(container, COL2, ROW1);
-    lv_obj_clear_flag(container, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Meter for the RPM
-    lv_obj_t* scale = lv_scale_create(container);
-    int32_t  width = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
-    int32_t  height = width;
-
-    lv_obj_set_size(scale, width, height);
-    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
-    lv_obj_set_style_bg_opa(scale, LV_OPA_80, 0);
-    lv_obj_set_style_bg_color(scale, lv_color_black(), 0);
-    lv_obj_set_style_radius(scale, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_clip_corner(scale, true, 0);
-    lv_obj_center(scale);
-
-    static lv_style_t indicator_style;
-    lv_style_init(&indicator_style);
-
-    /* Label style properties */
-    lv_style_set_text_font(&indicator_style, &RobotoCondensedVariableFont_wght24);
-    lv_style_set_text_color(&indicator_style, lv_palette_main(LV_PALETTE_YELLOW));
-
-    /* Major tick properties */
-    lv_style_set_line_color(&indicator_style, lv_palette_main(LV_PALETTE_YELLOW));
-    lv_style_set_length(&indicator_style, 8); /* tick length */
-    lv_style_set_line_width(&indicator_style, 2); /* tick width */
-    lv_obj_add_style(scale, &indicator_style, LV_PART_INDICATOR);
-
-    static const char* rpm_ticks[] = { "0", "5", "10", "15", "20", "25", "30", "35" };
-    lv_scale_set_text_src(scale, rpm_ticks);
-    lv_scale_set_label_show(scale, true);
-    lv_scale_set_total_tick_count(scale, 31);
-    lv_scale_set_major_tick_every(scale, 5);
-
-    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
-    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
-    lv_scale_set_range(scale, 1, 3500);
-
-    lv_scale_set_angle_range(scale, 270);
-    lv_scale_set_rotation(scale, 135);
-
-    static lv_style_t scale_style;
-    lv_style_init(&scale_style);
-    lv_style_set_line_width(&scale_style, 6);
-
-    lv_obj_add_style(scale, &scale_style, LV_PART_ANY);
-
-    lv_obj_t* needle = lv_image_create(scale);
-    needle = lv_line_create(scale);
-    lv_obj_set_style_line_width(needle, 5, 0);
-    lv_obj_set_style_line_rounded(needle, true, 0);
-    lv_obj_set_style_line_color(needle, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_scale_set_line_needle_value(scale, needle, 50, 10);
-
-    // Label in the dial
-    const char* lab = "RPM x100";
-    lv_obj_t* label = lv_label_create(scale);
-    lv_label_set_text(label, lab);
-
-    lv_obj_set_style_text_font(label, &RobotoCondensedVariableFont_wght12, 0);
-    lv_obj_set_style_text_color(label, lv_palette_main(LV_PALETTE_YELLOW), 0);
-    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-    uint32_t w = lv_text_get_width(lab, strlen(lab), &RobotoCondensedVariableFont_wght12, 1);
-    lv_obj_set_pos(label, TFT_WIDTH / 4 - (w / 2), TFT_HEIGHT / 3);
-
-    // Save the scale line and image for updates
-    gauges[SCR_ENGINE] = scale;
-    needles[SCR_ENGINE] = needle;
-    setGauge(SCR_ENGINE, 0.0);
-#else 
     LV_IMG_DECLARE(rpm);
     uint32_t w = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
     uint32_t h = w;
     meters[SCR_ENGINE] = new Meter(screen, &rpm, w, h, 0.0, 30.0, 270.0, -135.0);
     meters[SCR_ENGINE]->setPos(TFT_WIDTH / 2, BAR_HEIGHT);
     meters[SCR_ENGINE]->setVal(0);
-#endif
+
     setupMenu(screen);
     return screen;
 
@@ -482,7 +322,6 @@ lv_obj_t* createEnvScreen() {
     ind[SCR_ENV][SEATEMP] = new Indicator(screen, "Air Temp", COL2, ROW1);
     ind[SCR_ENV][WINDSP] = new Indicator(screen, "Humidity", COL2, ROW2);
     ind[SCR_ENV][WINDANGLE] = new Indicator(screen, "Pressure", COL2, ROW3);
-
 
     setupMenu(screen);
     return screen;
