@@ -449,10 +449,6 @@ void updateTime() {
     char buf[10];
     time_t now = time(NULL);
     gmtime_r(&now, &tm);
-    static float rpm = 0;
-    static float delta = 1;
-    static float wind = 0;
-    static float winddelta = 1;
 
     if (now > last) {
         last = now;
@@ -463,14 +459,5 @@ void updateTime() {
         bars[SCR_GNSS]->setTime(buf);
         bars[SCR_ENV]->setTime(buf);
         bars[SCR_SYSINFO]->setTime(buf);
-        meters[SCR_ENGINE]->setVal(rpm);
-        rpm = rpm + delta;
-        if(rpm >= 30) {
-            delta = -1;
-        } else if(rpm < 0) {
-            delta = 1;
-        }
-        meters[SCR_NAV]->setVal(wind);
-        wind += 11;
     }
 }
