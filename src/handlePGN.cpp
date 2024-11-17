@@ -28,7 +28,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <NMEA2000.h>
 #include <handlePGN.h>
 #include <StringStream.h>
-#include <ArduinoJson.h>
 
 // Display handlers
 #include <display.h>
@@ -69,13 +68,6 @@ void handlePGN(tN2kMsg& msg) {
         tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
         tm.tm_hour, tm.tm_min, tm.tm_sec);
 
-   // Base object for logging
-    JsonDocument doc;
-    doc["PGN"] = msg.PGN;
-    doc["ms"] = millis();
-
-    // Add a record for the data found
-    JsonObject record = doc[buf].to<JsonObject>();
 
     // Flag to indicate we actually wrote some data.
     bool hadData = true;   // We negate this in the default case below
@@ -95,15 +87,9 @@ void handlePGN(tN2kMsg& msg) {
                     case 0:
                         setMeter(SCR_ENGINE, HOUSEV, voltage, "V");
                         setMeter(SCR_ENGINE, HOUSEI, current, "A");
-                        record["instance"]  = instance;
-                        record["housev"] = voltage;
-                        record["housei"] = current;
                         break;
                     case 1:
                         setMeter(SCR_ENGINE, ENGINEV, voltage, "V");
-                        record["instance"]  = instance;
-                        record["enginev"] = voltage;
-                        ;
                         break;
                 }
             }
@@ -124,8 +110,6 @@ void handlePGN(tN2kMsg& msg) {
                 setGauge(SCR_ENGINE, speed / 100);
                 String es(speed, 0);
                 es += "rpm";
-//                setVlabel(SCR_ENGINE, es);
-                record["rpm"] = (int)speed / 100;
             }
         } break;
 
@@ -138,15 +122,12 @@ void handlePGN(tN2kMsg& msg) {
             bool s = ParseN2kPGN130306(msg, instance, windSpeed, windAngle, ref);
             String ws(msToKnots(windSpeed));
             ws += "kts";
-//            setVlabel(SCR_NAV, ws);
             if(s && windAngle != N2kDoubleNA) {
                 setGauge(SCR_NAV, (int)RadToDeg(windAngle));
                 setMeter(SCR_ENV, WINDANGLE, RadToDeg(windAngle), "°");
-                record["angle"] = (int)RadToDeg(windAngle);
             }
             if(s && windSpeed != N2kDoubleNA) {
                 setMeter(SCR_ENV, WINDSP, msToKnots(windSpeed), "kts");
-                record["wind"] = dpf(msToKnots(windSpeed), 1);
             }
         } break;
 
@@ -160,12 +141,10 @@ void handlePGN(tN2kMsg& msg) {
             if(s && sog != N2kDoubleNA) {
                 setMeter(SCR_NAV, NAV_SOG, msToKnots(sog), "kts");
                 setMeter(SCR_GNSS, GNSS_SOG, msToKnots(sog), "kts");
-                record["sog"] = dpf(msToKnots(sog), 1);
             }
             if(s && hdg != N2kDoubleNA) {
                 setMeter(SCR_NAV, NAV_COG, RadToDeg(hdg), "°");
                 setMeter(SCR_GNSS, GNSS_COG, RadToDeg(hdg), "°");
-                record["cog"] = (int)RadToDeg(hdg);
             }
         } break;
 
@@ -178,7 +157,6 @@ void handlePGN(tN2kMsg& msg) {
             bool s = ParseN2kPGN128267(msg, instance, depth, offset, range);
             if(s && depth != N2kDoubleNA) {
                 setMeter(SCR_NAV, DEPTH, depth, "m");
-                record["depth"] = dpf(depth,1);
             }
         } break;
 
@@ -225,13 +203,7 @@ void handlePGN(tN2kMsg& msg) {
                 setMeter(SCR_GNSS, GNSS_LAT, decimalDegDMM(Latitude));
                 setMeter(SCR_GNSS, GNSS_LON, decimalDegDMM(Longitude));
 
-                record["lat"] = Latitude;
-                record["lon"] = Longitude;
-                record["time"] = buf;
-                record["days"] = DaysSince1970;
-                record["seconds"] = SecondsSinceMidnight;
 
-#define SECONDS_IN_DAY (60 * 60 * 24)
 
                 time_t now = (DaysSince1970 * SECONDS_IN_DAY) + SecondsSinceMidnight;
                 // now = 365 * 10 * SECONDS_IN_DAY;
@@ -267,7 +239,6 @@ void handlePGN(tN2kMsg& msg) {
 
             if(s && WaterTemperature > 273.0) {
                 setMeter(SCR_ENV, SEATEMP, KelvinToC(WaterTemperature), "°C");
-                record["seatemp"] = dpf(KelvinToC(WaterTemperature),1);
             }
         } break;
 
@@ -283,7 +254,6 @@ void handlePGN(tN2kMsg& msg) {
 
             if(s && ActualTemperature != 0.01) {
                 setMeter(SCR_ENV, AIRTEMP, KelvinToC(ActualTemperature), "°C");
-                record["airtemp"] = dpf(KelvinToC(ActualTemperature),1);
             }
         } break;
 
@@ -312,7 +282,6 @@ void handlePGN(tN2kMsg& msg) {
 
             if(s && Pressure != 0.01) {
                 setMeter(SCR_ENV, PRESSURE, Pressure / 100, "");
-                record["pressure"]  = (int)Pressure / 100;
             }
         } break;
 

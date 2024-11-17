@@ -27,6 +27,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <NMEA0183Messages.h>
 #include <NMEA0183Msg.h>
 
+#define SECONDS_IN_DAY (60 * 60 * 24)
+
 // Input/Output stream
 extern Stream *Console;
 
