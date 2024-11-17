@@ -30,9 +30,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #include <YDtoN2KUDP.h>
-//#include <GwLogger.h>
 
 // Constructor
 YDtoN2kUDP::YDtoN2kUDP() {
