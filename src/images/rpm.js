@@ -4,19 +4,19 @@
 
 // https://github.com/Mikhus/canvas-gauges
 var rpmpauge = new RadialGauge({
-    renderTo: 'gauge-radial-1',
+    renderTo: 'rpm',
     highlights: [
         { "from": 0, "to": 25, "color": "rgba(0,255,0)" },
         { "from": 25, "to": 30, "color": "rgba(255,0,0)" }
     ],
-    width: 300,
-    height: 300,
+    width: 160,
+    height: 160,
     units: "RPM/100",
     minValue: 0,
     maxValue: 30,
     majorTicks: [0,5,10,15,20,25,30],
     minorTicks: 10,
-    strokeTicks: true,
+    strokeTicks: false,
     colorPlate: "#fff",
     borderShadowWidth: 0,
     borders: false,
@@ -31,7 +31,10 @@ var rpmpauge = new RadialGauge({
     valueBox: false,
     valueInt: 2,
     valueDec: 2,
-    fontNumbersSize:38,
+    fontNumbersSize:42,
+    fontNumbersWeight: "bold",
+    fontUnitsSize: 32,
+    numbersMargin: -16,
 }).draw()
 // var gauge = new LinearGauge({
 //     renderTo: 'gauge-radial-1'
@@ -52,7 +55,7 @@ uibuilder.onChange('msg', function(msg) {
 
 function download() {
     var download = document.getElementById("download");
-    var image = document.getElementById("gauge-radial-1").toDataURL("image/png")
+    var image = document.getElementById("rpm").toDataURL("image/png")
         .replace("image/png", "image/octet-stream");
     download.setAttribute("href", image);
 }
