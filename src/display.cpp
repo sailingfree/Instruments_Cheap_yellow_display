@@ -11,17 +11,20 @@
 #include <N2kMsg.h>
 #include <map>
 #include <Meter.h>
+#include <SysInfo.h>
 
 static const uint32_t border = 1, padding = 0;
 
 static void buttonHandler(lv_event_t* e);
 
+// Pointers to the screens and their components.
+// Will all be NULL at initialisation
 lv_obj_t* screens[SCR_MAX];
 static Indicator* ind[SCR_MAX][12];
 static InfoBar* bars[SCR_MAX];
-static lv_obj_t* gauges[SCR_MAX];
-static lv_obj_t* needles[SCR_MAX];
 static Meter* meters[SCR_MAX];
+// define the text areas
+static lv_obj_t* textAreas[SCR_MAX];
 
 // Constructor. Binds to the parent object.
 Indicator::Indicator(lv_obj_t* parent, const char* name, uint32_t x, uint32_t y) {
@@ -144,7 +147,7 @@ static void buttonHandler(lv_event_t* e) {
 
     if (code == LV_EVENT_PRESSED) {
         if (s >= 0 && s < SCR_MAX && screens[s]) {
-            //  refreshData(s);
+            refreshSysinfo();
             lv_scr_load(screens[s]);
         }
     }
@@ -351,6 +354,12 @@ lv_obj_t* createSysInfoScreen() {
     setupCommonstyles(screen);
     setupHeader(SCR_SYSINFO, screen, "System");
 
+    // Create a text area to display the info text
+    textAreas[SCR_SYSINFO] = lv_textarea_create(screen);
+    lv_obj_set_size(textAreas[SCR_SYSINFO], TFT_WIDTH, BODY_HEIGHT);
+    lv_obj_align(textAreas[SCR_SYSINFO], LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_text_font(textAreas[SCR_SYSINFO], &UbuntuMonoB16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     setupMenu(screen);
     return screen;
 }
@@ -419,9 +428,8 @@ void setMeter(Screens scr, MeterIdx idx, double value, const char* units, uint32
 }
 
 void setGauge(Screens scr, double value) {
-    if (scr >= 0 && scr < SCR_MAX && gauges[scr] && needles[scr]) {
-        lv_scale_set_line_needle_value(gauges[scr], needles[scr], TFT_WIDTH, (int32_t)value);
-        metersWork();
+    if (scr >= 0 && scr < SCR_MAX && meters[scr]) {
+        meters[scr]->setVal(value);
     }
 }
 
@@ -437,6 +445,15 @@ void setMeter(Screens scr, MeterIdx idx, const char* str) {
     if (scr >= 0 && scr < SCR_MAX && ind[scr][idx]) {
         ind[scr][idx]->setValue(str);
     }
+}
+
+// Refresh the info in the sysinfo page
+void refreshSysinfo() {
+    StringStream s;
+        s.clear();
+        getSysInfo(s);
+        getNetInfo(s);
+        lv_textarea_set_text(textAreas[SCR_SYSINFO], s.data.c_str());
 }
 
 // Update the time displayed on the screen.

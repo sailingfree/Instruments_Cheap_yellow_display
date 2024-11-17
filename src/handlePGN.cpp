@@ -140,9 +140,9 @@ void handlePGN(tN2kMsg& msg) {
             ws += "kts";
 //            setVlabel(SCR_NAV, ws);
             if(s && windAngle != N2kDoubleNA) {
-                setGauge(SCR_NAV, (int)RadToDeg(windAngle) + 180);
+                setGauge(SCR_NAV, (int)RadToDeg(windAngle));
                 setMeter(SCR_ENV, WINDANGLE, RadToDeg(windAngle), "°");
-                record["angle"] = (int)RadToDeg(windAngle) + 180;
+                record["angle"] = (int)RadToDeg(windAngle);
             }
             if(s && windSpeed != N2kDoubleNA) {
                 setMeter(SCR_ENV, WINDSP, msToKnots(windSpeed), "kts");

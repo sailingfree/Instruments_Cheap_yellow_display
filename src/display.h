@@ -163,3 +163,5 @@ void loadScreen();
 void displayText(const char*);
 // Time display update
 void updateTime();
+// Refresh the info in the sysinfo page
+void refreshSysinfo();
