@@ -276,12 +276,12 @@ lv_obj_t* createNavScreen() {
     ind[SCR_NAV][NAV_COG] = new Indicator(screen, "COG", COL1, ROW2);
     ind[SCR_NAV][DEPTH] = new Indicator(screen, "Depth", COL1, ROW3);
 
- //   LV_IMG_DECLARE(wind);
- //   uint32_t w = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
- //   uint32_t h = w;
- //   meters[SCR_NAV] = new Meter(screen, &wind, w, h, 0.0, 359, 360, 0.0);
- //   meters[SCR_NAV]->setPos(TFT_WIDTH / 2, BAR_HEIGHT);
- //   meters[SCR_NAV]->setVal(45);
+    LV_IMG_DECLARE(wind);
+    uint32_t w = MIN(TFT_WIDTH / 2, BODY_HEIGHT);
+    uint32_t h = w;
+    meters[SCR_NAV] = new Meter(screen, &wind, w, h, 0.0, 359, 360, 0.0);
+    meters[SCR_NAV]->setPos(TFT_WIDTH / 2, BAR_HEIGHT);
+    meters[SCR_NAV]->setVal(45);
 
     setupMenu(screen);
     return screen;
@@ -451,6 +451,8 @@ void updateTime() {
     gmtime_r(&now, &tm);
     static float rpm = 0;
     static float delta = 1;
+    static float wind = 0;
+    static float winddelta = 1;
 
     if (now > last) {
         last = now;
@@ -468,5 +470,7 @@ void updateTime() {
         } else if(rpm < 0) {
             delta = 1;
         }
+        meters[SCR_NAV]->setVal(wind);
+        wind += 11;
     }
 }
