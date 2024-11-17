@@ -29,14 +29,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <SimpleSerialShell.h>
 #include <StringStream.h>
 #include <SysInfo.h>
-#include <sdcard.h>
-#include <GwLogger.h>
-
 #include <map>
 
-static std::map<int, String> History;
-static const int maxhist = 8;
-// static int curhist;
 
 // Output the ID of the code
 static int showID(int argc = 0, char** argv = NULL) {
@@ -57,19 +51,6 @@ int net(int argc, char** argv) {
     StringStream s;
     getNetInfo(s);
     shell.print(s.data);
-    return 0;
-}
-
-// Storage details
-int storage(int argc, char** argv) {
-    StringStream s;
-    dir("/", 2, s);
-    shell.print(s.data);
-    return 0;
-}
-
-int format(int argc, char ** argv) {
-    formatSD();
     return 0;
 }
 
@@ -163,78 +144,6 @@ int messages(int argc, char** argv) {
     return 0;
 }
 
-// remove a file
-int rmfile(int argc, char ** argv) {
-    String fname;
-    if(argc > 1) {
-        fname = argv[1];
-    } else {
-        errorPrint("Please supply filename\n");
-        return 0;
-    }
-
-    if (!sd.remove(fname.c_str())) {
-        errorPrint("Error deleteing file\n");
-        return 0;
-    }
-    return 0;
-}
-
-// cat a file to the output
-int catlog(int argc, char ** argv) {
-    String logname;
-
-    if(argc > 1) {
-        logname = argv[1];
-    } else {
-        errorPrint("Please supply filename\n");
-        return 0;
-    }
-
-    if (!file.open(logname.c_str(), O_RDWR)) {
-        errorPrint("Reading logfile\n");
-        return 0;
-    }
-
-    char buf[256];
-    int c;
-    do {
-        c = file.fgets(buf, sizeof(buf) -1);
-        shell.print(buf);
-    } while(c);
-    file.close();
-    return 0;
-}
-
-// Display details of the storage
-// More then just df!
-int df(int argc, char ** argv) {
-    StringStream str;
-
-    if(hasSdCard()) {
-        shell.printf("SD Card found. Type: %s\n", getCardType());
-
-        // capacity in in MB (1000000 bytes)
-        uint32_t capacity = getCapacity();
-
-        // Convert to GiB and print
-        shell.printf("Sd capacity %d (GB)\n", 
-            capacity /1024);
-
-        sd.printFatType(&str);
-        shell.printf("Filesystem type: %s\n", str.data);
-
-        uint32_t clusters = sd.clusterCount();
-        uint32_t freeclusters = sd.freeClusterCount();
-        uint32_t blkpercluster = sd.sectorsPerCluster();
-
-        Serial.printf("%d %d %d\n", clusters, freeclusters, blkpercluster);
-    } else {
-        shell.printf("No storage device found\n");
-    }
-    return 0;
-}
-
 // Initialise the shell and add the commands
 // The format of the command is HELP_TEXT<space>CMD
 void initGwShell() {
@@ -248,11 +157,6 @@ void initGwShell() {
     shell.addCommand(F("logger \tSet the output logging. (logger on|off)"), logger);
     shell.addCommand(F("reboot \tReboot the ESP"), reboot);
     shell.addCommand(F("msgs \t\tShow the N2K message counts"), messages);
-    shell.addCommand(F("dir \t\tList storage"), storage);
-    shell.addCommand(F("Format the SD card"), format);
-    shell.addCommand(F("cat \t\tRead the logfile"), catlog);
-    shell.addCommand(F("rm \t\tDelete a file"), rmfile);
-    shell.addCommand(F("df \t\tDisplays details of the storage"), df);
 }
 
 // Print a prompt to the terminal

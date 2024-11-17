@@ -28,7 +28,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <NMEA2000.h>
 #include <handlePGN.h>
 #include <StringStream.h>
-#include <GwLogger.h>
 #include <ArduinoJson.h>
 
 // Display handlers
@@ -322,14 +321,5 @@ void handlePGN(tN2kMsg& msg) {
             // and indicate no data
             hadData = false;
             break;
-    }
-
-    // If we had some data then log it
-    size_t size = record.size();
-    if(hadData && size > 0) {
-        String buffer;
-        serializeJson(doc, buffer);
-        append_log(buffer.c_str());
-        String now = rtc.getTime("%A, %B %d %Y %H:%M:%S");
     }
 }

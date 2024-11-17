@@ -38,12 +38,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // Admin functions setup
 #include <MyAdmin.h>
 
-// Storage
-#include <sdcard.h>
-
-// Logging
-#include <GwLogger.h>
-
 // PGN and time handler
 #include <handlePGN.h>
 
@@ -62,8 +56,6 @@ void setup() {
     wifiSetup(host_name);  // Conect to an AP for the YD data
     webServerSetup();      // remote management
 //    displayText("Web server started...");
-//    sdcard_setup();
-//    setup_logging();
     // Finally load the first working screen
 //    loadScreen();
     Serial.println("Setup done...");

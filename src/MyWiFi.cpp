@@ -30,8 +30,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <YDtoN2KUDP.h>
 #include <handlePGN.h>
 #include <map>
-#include <sdcard.h>
-#include <SdFat.h>
 #include <SysInfo.h>
 
 // Map for received n2k messages. Logs the PGN and the count
