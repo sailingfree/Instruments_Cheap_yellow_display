@@ -322,9 +322,9 @@ lv_obj_t* createEnvScreen() {
     ind[SCR_ENV][AIRTEMP] = new Indicator(screen, "Air Temp", COL1, ROW1);
     ind[SCR_ENV][HUM] = new Indicator(screen, "Humidity", COL1, ROW2);
     ind[SCR_ENV][PRESSURE] = new Indicator(screen, "Pressure", COL1, ROW3);
-    ind[SCR_ENV][SEATEMP] = new Indicator(screen, "Air Temp", COL2, ROW1);
-    ind[SCR_ENV][WINDSP] = new Indicator(screen, "Humidity", COL2, ROW2);
-    ind[SCR_ENV][WINDANGLE] = new Indicator(screen, "Pressure", COL2, ROW3);
+    ind[SCR_ENV][SEATEMP] = new Indicator(screen, "Sea Temp", COL2, ROW1);
+    ind[SCR_ENV][WINDSP] = new Indicator(screen, "Wind Speed", COL2, ROW2);
+    ind[SCR_ENV][WINDANGLE] = new Indicator(screen, "Apparent Wind", COL2, ROW3);
 
     setupMenu(screen);
     return screen;
