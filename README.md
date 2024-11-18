@@ -1,4 +1,7 @@
-Project to use the Cheap Yellow Display to show some useful N2K related data on the screen.
+Project to use the Cheap Yellow Display and a ublox 6m GPS module to generate YachtData format UDP messages.
+It also shows a sky view of the GPS constellation and signal S/N levels.
+
+It is based on my other N2K modules and instruments.
 
 To create the images do this:
 - install the live server preview extension
