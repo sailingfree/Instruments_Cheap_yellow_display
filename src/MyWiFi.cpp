@@ -162,7 +162,8 @@ void wifiSetup(String& host_name) {
     wifiCreds[0].pass = GwGetVal(SSPW1);
     wifiCreds[1].ssid = GwGetVal(SSID2);
     wifiCreds[1].pass = GwGetVal(SSPW2);
-
+    WiFi.setHostname(host_name.c_str());
+    
     while (!connectWifi() && --retries) {
         sleep(1);
     }
