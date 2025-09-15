@@ -1,5 +1,4 @@
 // System and net info
-
 /*
 Copyright (c) 2022 Peter Martin www.naiadhome.com
 
@@ -27,56 +26,64 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <NMEA0183Messages.h>
 #include <SysInfo.h>
 #include <esp_wifi.h>
+#include <lv_version.h>
+#include <esp_idf_version.h>
 
 #include "uptime_formatter.h"
 #include <Version.h>
 
-// Format the network information and send to the configured stream
 void getNetInfo(Stream &s) {
-    wifi_sta_list_t wifi_sta_list;
-    tcpip_adapter_sta_list_t adapter_sta_list;
-
     s.println("=========== NETWORK ==========");
-    s.printf("HOST NAME\t%s\n", host_name.c_str());
-    s.printf("MAC\t\t%s\n", macAddress.c_str());
-    s.printf("WifiMode\t%s\n", WifiMode.c_str());
-    s.printf("WifiIP\t\t%s\n", WifiIP.c_str());
-    s.printf("WifiSSID\t%s\n", WifiSSID.c_str());
-
+    s.printf("HOST NAME: %s\n", host_name.c_str());
+    s.printf("MAC: %s\n", macAddress.c_str());
+    s.printf("WifiMode %s\n", WifiMode.c_str());
+    s.printf("WifiIP %s\n", WifiIP.c_str());
+    s.printf("WifiSSID %s\n", WifiSSID.c_str());
     s.println("=========== END ==========");
 }
 
-// get and format the system information and send to the configured stream.
+void getTaskInfo(Stream &s) {
+    UBaseType_t ntasks = uxTaskGetNumberOfTasks();
+    s.println("=========== TASKS ==========");
+    s.printf("There are %d tasks\n", ntasks);
+//    task_monitor();
+    s.println("=========== SYSTEM ==========");
+}
+
+
 void getSysInfo(Stream &s) {
     EspClass esp;
 
-    uint32_t heap = esp.getHeapSize();      // total heap size
-    uint32_t freeheap = esp.getFreeHeap();  // available heap
-    uint32_t heapUsedPc = (heap - freeheap) * 100 / heap;
+    uint32_t heapSize = esp.getHeapSize();      // total heap size
+    uint32_t heapFree = esp.getFreeHeap();  // available heap
+    uint32_t heapUsedPc = (heapSize - heapFree) * 100 / heapSize;
 
-    uint8_t chiprev = esp.getChipRevision();
-    const char *model = esp.getChipModel();
+    uint8_t chipRev = esp.getChipRevision();
+    const char *chipModel = esp.getChipModel();
     uint32_t sketchSize = esp.getSketchSize();
-    uint32_t freeSketch = esp.getFreeSketchSpace();
-    uint32_t flashsize = esp.getFlashChipSize();
-    uint32_t flashUsedPc = (flashsize - freeSketch) * 100 / flashsize;
-    uint64_t efuse = esp.getEfuseMac();
+    uint32_t sketchFree = esp.getFreeSketchSpace();
+    uint32_t flashSize = esp.getFlashChipSize();
+    uint32_t flashUsedPc = (flashSize - sketchFree) * 100 / flashSize;
+    uint64_t efuseMAC = esp.getEfuseMac();
     String uptime = uptime_formatter::getUptime();
 
-
     s.println("=========== SYSTEM ==========");
-    s.printf("Version\t\t%s\n", VERSION);
-    s.printf("Date\t\t%s\n", BUILD_TIMESTAMP);
-    s.printf("Model\t\t%s\n", Model.c_str());
-    s.printf("Uptime\t\t%s", uptime.c_str());
-    s.printf("Heap\t%d\n", heap);
-    s.printf("Heap Free\t%d\n", freeheap);
-    s.printf("Heap used\t%d%%\n", heapUsedPc);
-    s.printf("ChipRev\t\t%d\n", chiprev);
-    s.printf("Sketch\t\t%d\n", sketchSize);
-    s.printf("Sketch Free\t%d\n", freeSketch);
-    s.printf("Flash used\t%d%%\n", flashUsedPc);
-    s.printf("Efuse\t\t0x%llx\n", efuse);
+    s.printf("Model %s\n", Model.c_str());
+    s.printf("Uptime: %s", uptime.c_str());
+    s.printf("Heap \t%d\n", heapSize);
+    s.printf("Heap Free\t%d\n", heapFree);
+    s.printf("Heap used %d%%\n", heapUsedPc);
+    s.printf("ChipRev \t%d\n", chipRev);
+    s.printf("Model \t%s\n", chipModel);
+    s.printf("Sketch \t%d\n", sketchSize);
+    s.printf("Sketch Free \t%d\n", sketchFree);
+    s.printf("Flash used %d%%\n", flashUsedPc);
+    s.printf("Efuse \t0x%llx\n", efuseMAC);
+    s.println("=========== BUILD ==========");
+    s.printf("Build version %s\n", VERSION);
+    s.printf("Build date: %s\n", BUILD_TIMESTAMP);
+    s.printf("LVGL Version %d.%d.%d\n", LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
+    s.printf("ESPIDF %s\n", esp_get_idf_version());
     s.println("=========== SETTINGS ==========");
     GwPrint(s);
     s.println("=========== END ==========");
