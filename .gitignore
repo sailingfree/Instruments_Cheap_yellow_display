@@ -179,3 +179,4 @@ managed_components/espressif__mdns/tests/unit_test/sdkconfig.ci
 managed_components/espressif__mdns/tests/unit_test/sdkconfig.defaults
 managed_components/espressif__mdns/tests/unit_test/main/test_mdns.c
 src/.DS_Store
+.vscode/extensions.json
