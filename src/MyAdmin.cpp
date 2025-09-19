@@ -28,6 +28,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <GwShell.h>
 #include <GwTelnet.h>
 #include <MyWiFi.h>
+#include "esp_mac.h"
 
 // Global objects and variables
 String host_name;
