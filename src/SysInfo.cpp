@@ -55,22 +55,14 @@ void getTaskInfo(Stream &s) {
 void getSysInfo(Stream &s) {
     EspClass esp;
 
-    uint32_t heapSize = esp.getHeapSize();      // total heap size
-    uint32_t heapFree = esp.getFreeHeap();  // available heap
-    uint32_t heapUsedPc = (heapSize - heapFree) * 100 / heapSize;
-
-    uint8_t chipRev = esp.getChipRevision();
-    const char *chipModel = esp.getChipModel();
-    uint32_t sketchSize = esp.getSketchSize();
     uint32_t sketchFree = esp.getFreeSketchSpace();
     uint32_t flashSize = esp.getFlashChipSize();
     uint32_t flashUsedPc = (flashSize - sketchFree) * 100 / flashSize;
-    uint64_t efuseMAC = esp.getEfuseMac();
     String uptime = uptime_formatter::getUptime();
 
     s.println("=========== SYSTEM ==========");
     systemInfo(s);
-    s.printf("Flash used %d%%\n", flashUsedPc);
+    s.printf("Flash used %ld%%\n", flashUsedPc);
     s.println("=========== BUILD ==========");
     s.printf("Build version %s\n", VERSION);
     s.printf("Build date: %s\n", BUILD_TIMESTAMP);

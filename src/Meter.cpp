@@ -18,7 +18,7 @@ Meter::Meter(lv_obj_t* parent, const lv_image_dsc_t* img,
     max = maxVal;
     offset = off;
     sweep = sw;    // Assume end > start
-    Serial.printf("Creating Meter %d %d %f %f %f %f\n",
+    Serial.printf("Creating Meter %ld %ld %f %f %f %f\n",
         w, h, min, max, sweep, offset);
 
     static lv_style_t style;
@@ -55,7 +55,7 @@ void Meter::setVal(float val) {
     points[1].x = origx + (sin(theta) * radius);
     points[1].y = origy - (cos(theta) * radius);
     lv_line_set_points(needle, points, 2);
-    Serial.printf("NEEDLE %d %d %d %d\n", points[0].x,
+    Serial.printf("NEEDLE %ld %ld %ld %ld\n", points[0].x,
     points[0].y,
     points[1].x,
     points[1].y);

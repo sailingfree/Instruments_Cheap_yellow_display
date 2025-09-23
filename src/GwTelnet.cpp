@@ -32,11 +32,11 @@ void handleTelnet() {
         // Got a connected client so use it
     } else {
         // See if there is a new connection and assign the new client
-        telnetClient = telnet.available();
+        telnetClient = telnet.accept();
         if (telnetClient) {
             // Set up the client
             // telnetClient.setNoDelay(true); // More faster
-            telnetClient.flush();  // clear input buffer, else you get strange characters
+            telnetClient.clear();  // clear input buffer, else you get strange characters
             setShellSource(&telnetClient);
             Serial.printf("Telnet client connected\n");
         }
