@@ -31,6 +31,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "uptime_formatter.h"
 #include <Version.h>
+#include <systemInfo.h>
 
 void getNetInfo(Stream &s) {
     s.println("=========== NETWORK ==========");
@@ -68,17 +69,8 @@ void getSysInfo(Stream &s) {
     String uptime = uptime_formatter::getUptime();
 
     s.println("=========== SYSTEM ==========");
-    s.printf("Model %s\n", Model.c_str());
-    s.printf("Uptime: %s", uptime.c_str());
-    s.printf("Heap \t%d\n", heapSize);
-    s.printf("Heap Free\t%d\n", heapFree);
-    s.printf("Heap used %d%%\n", heapUsedPc);
-    s.printf("ChipRev \t%d\n", chipRev);
-    s.printf("Model \t%s\n", chipModel);
-    s.printf("Sketch \t%d\n", sketchSize);
-    s.printf("Sketch Free \t%d\n", sketchFree);
+    systemInfo(s);
     s.printf("Flash used %d%%\n", flashUsedPc);
-    s.printf("Efuse \t0x%llx\n", efuseMAC);
     s.println("=========== BUILD ==========");
     s.printf("Build version %s\n", VERSION);
     s.printf("Build date: %s\n", BUILD_TIMESTAMP);
