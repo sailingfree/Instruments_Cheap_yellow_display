@@ -12,3 +12,6 @@ src/.DS_Store
 .vscode/extensions.json
 .version_no_increment
 version
+sdkconfig.defaults
+sdkconfig.esp32-2432S028R-pioarduino
+.gitignore

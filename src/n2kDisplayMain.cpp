@@ -69,4 +69,5 @@ void loop(void) {
     wifiCheck();
     updateTime();    
     metersWork();
+    delayMicroseconds(10);
 }
