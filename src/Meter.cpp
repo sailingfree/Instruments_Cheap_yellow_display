@@ -48,17 +48,13 @@ void Meter::setVal(float val) {
     uint32_t radius = (width / 2) - 15;
 
     theta = (val / max * DegToRad(sweep)) + DegToRad(offset);
-    Serial.printf("Setting meter value %f theta %f (%f) max %f sweep %f offset %f\n", val, theta, RadToDeg(theta), max, sweep, offset);
     points[0].x = origx;
     points[0].y = origy;
 
     points[1].x = origx + (sin(theta) * radius);
     points[1].y = origy - (cos(theta) * radius);
     lv_line_set_points(needle, points, 2);
-    Serial.printf("NEEDLE %ld %ld %ld %ld\n", points[0].x,
-    points[0].y,
-    points[1].x,
-    points[1].y);
+
 }
 
 
