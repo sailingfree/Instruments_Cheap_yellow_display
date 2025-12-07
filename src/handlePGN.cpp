@@ -200,15 +200,17 @@ void handlePGN(tN2kMsg& msg) {
 #pragma GCC diagnostic pop
 
             String latStr(Latitude, 5);
-            String lonStr(Longitude, 5);
-            String sats(nSatellites);
-            setMeter(SCR_GNSS, GNSS_HDOP, Hdop, "");
-            setMeter(SCR_GNSS, GNSS_SATS, sats);
             setMeter(SCR_GNSS, GNSS_LAT, decimalDegDMM(Latitude));
+            String lonStr(Longitude, 5);
             setMeter(SCR_GNSS, GNSS_LON, decimalDegDMM(Longitude));
-
-
-
+            if(nSatellites != N2kUInt8NA) {
+                String sats(nSatellites); 
+                setMeter(SCR_GNSS, GNSS_SATS, sats);
+            }
+            if(Hdop != N2kDoubleNA) {
+                setMeter(SCR_GNSS, GNSS_HDOP, Hdop, "");
+            }
+ 
             time_t now = (DaysSince1970 * SECONDS_IN_DAY) + SecondsSinceMidnight;
             // now = 365 * 10 * SECONDS_IN_DAY;
             // now += 26 * SECONDS_IN_DAY;
