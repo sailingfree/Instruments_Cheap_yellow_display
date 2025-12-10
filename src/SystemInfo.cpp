@@ -35,7 +35,6 @@ void ESPinfo(Stream & stream){
     stream.printf("   SketchSize:     %li (0x%lX) (%0.2f%% of Max)\n",    ESP.getSketchSize(), ESP.getSketchSize(), ESPSketchPercMax);
     stream.printf("   MaxSketchSpace: %li (0x%lX)\n",                     ESP.getFreeSketchSpace(), ESP.getFreeSketchSpace());
     stream.printf("   SketchMD5:      %s\n\n",                          ESP.getSketchMD5().c_str());
-    stream.printf("   ArduinoVersion: %s\n",                            ESP.getCoreVersion());
     stream.printf("   SdkVersion:     %s\n\n",                          ESP.getSdkVersion());
 
 
@@ -63,10 +62,6 @@ void ESPinfo(Stream & stream){
     stream.printf("   FreePSRAM:       %-7li  (0x%lX)\n",                  ESP.getFreePsram(),      ESP.getFreePsram());
     stream.printf("   MinFreePSRAM:    %-7li  (0x%lX)\n",                  ESP.getMinFreePsram(),      ESP.getMinFreePsram());
     stream.printf("   MaxAllocPSRAM:   %-7li  (0x%lX)\n",                  ESP.getMaxAllocPsram(),      ESP.getMaxAllocPsram());
-
-
-
-
 }
 
 

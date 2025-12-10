@@ -36,7 +36,7 @@ void handleTelnet() {
         if (telnetClient) {
             // Set up the client
             // telnetClient.setNoDelay(true); // More faster
-            telnetClient.clear();  // clear input buffer, else you get strange characters
+            telnetClient.flush();  // clear input buffer, else you get strange characters
             setShellSource(&telnetClient);
             Serial.printf("Telnet client connected\n");
         }
