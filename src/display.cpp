@@ -12,6 +12,7 @@
 #include <map>
 #include <Meter.h>
 #include <SysInfo.h>
+#include <sensors.h>
 
 static const uint32_t border = 1, padding = 0;
 
@@ -372,14 +373,7 @@ lv_obj_t* createSysInfoScreen() {
 lv_obj_t *tempTextF;
 lv_obj_t *tempTextC;
 lv_obj_t *timeText;
-
-#if TEMP_CELSIUS
-#define TEMP_ARC_MIN -20
-#define TEMP_ARC_MAX 40
-#else
-#define TEMP_ARC_MIN -4
-#define TEMP_ARC_MAX 104
-#endif
+lv_obj_t *dateText;
 
 // Set the temperature value in the arc and text label
 static void set_temp(void *text_label_temp_value, int32_t v) {
@@ -389,57 +383,28 @@ static void set_temp(void *text_label_temp_value, int32_t v) {
     float ds18b20_tempF = getTempF();
     const char degree_symbol[] = "\u00B0";
 
-#if 0
-#if TEMP_CELSIUS
-    if (ds18b20_tempC <= 10.0) {
-        lv_obj_set_style_text_color((lv_obj_t *)text_label_temp_value,
-                                    lv_palette_main(LV_PALETTE_BLUE), 0);
-    } else if (ds18b20_tempC > 10.0 && ds18b20_tempC <= 29.0) {
-        lv_obj_set_style_text_color((lv_obj_t *)text_label_temp_value,
-                                    lv_palette_main(LV_PALETTE_GREEN), 0);
-    } else {
-        lv_obj_set_style_text_color((lv_obj_t *)text_label_temp_value,
-                                    lv_palette_main(LV_PALETTE_RED), 0);
-    }
-    
-#else
-    float ds18b20_temp = getTempF();
-    if (ds18b20_temp <= 50.0) {
-        lv_obj_set_style_text_color((lv_obj_t *)text_label_temp_value,
-                                    lv_palette_main(LV_PALETTE_BLUE), 0);
-    } else if (ds18b20_temp > 50.0 && ds18b20_temp <= 84.2) {
-        lv_obj_set_style_text_color((lv_obj_t *)text_label_temp_value,
-                                    lv_palette_main(LV_PALETTE_GREEN), 0);
-    } else {
-        lv_obj_set_style_text_color((lv_obj_t *)text_label_temp_value,
-                                    lv_palette_main(LV_PALETTE_RED), 0);
-    }
-    const char degree_symbol[] = "\u00B0F";
-#endif
-#endif
-
-    //lv_arc_set_value(arc, map(int(ds18b20_tempC), TEMP_ARC_MIN, TEMP_ARC_MAX, 0, 100));
-
-    String ds18b20_temp_textC = String(ds18b20_tempC) + degree_symbol + "C";
-    String ds18b20_temp_textF = String(ds18b20_tempF) + degree_symbol + "F";
+    String ds18b20_temp_textC = String(ds18b20_tempC, 0) + degree_symbol + "C";
+    String ds18b20_temp_textF = String(ds18b20_tempF, 0) + degree_symbol + "F";
+    String tempText = ds18b20_temp_textC + " " + ds18b20_temp_textF;
     lv_label_set_text(tempTextC, ds18b20_temp_textC.c_str());
     lv_label_set_text(tempTextF, ds18b20_temp_textF.c_str());
 
     struct tm tm;
-    char buf[10];
+    char buf[32];
     time_t now = time(NULL);
     gmtime_r(&now, &tm);
 
     snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
     lv_label_set_text(timeText, buf);
 
-    Serial.print("Temperature: ");
-    Serial.println(ds18b20_temp_textC);
+    strftime(buf, sizeof(buf) - 1, "%a %d %b %y", &tm);
+    Serial.printf("%s\n", buf);
+    lv_label_set_text(dateText, buf);
 }
+
 
 lv_obj_t *createThermometer() {
     lv_obj_t *screen = lv_obj_create(NULL);
- //   lv_style_t arc_style;
 
     setupCommonstyles(screen);
     setupHeader(SCR_SYSINFO, screen, "Temperature");
@@ -459,14 +424,27 @@ lv_obj_t *createThermometer() {
     lv_style_init(&style_tempF);
     lv_style_set_text_font(&style_tempF, &RobotoCondensedVariableFont_wght52);
     lv_label_set_text(tempTextF, "--.--");
-    lv_obj_align(tempTextF, LV_ALIGN_TOP_LEFT, 0, ROW2);
+    lv_obj_align(tempTextF, LV_ALIGN_TOP_RIGHT, 0, ROW1);
     lv_obj_add_style(tempTextF, &style_tempF, 0);
 
     // Time
     timeText = lv_label_create(screen);
+    static lv_style_t style_time;
+    lv_label_set_text(timeText, "00:00:00");
+    lv_style_init(&style_time);
+    lv_style_set_text_font(&style_time, &RobotoCondensedVariableFont_wght64);
+    lv_obj_align(timeText, LV_ALIGN_TOP_MID, 0, ROW2);
+    lv_obj_add_style(timeText, &style_time, 0);
 
-    lv_obj_align(timeText, LV_ALIGN_TOP_LEFT, 0, ROW3);
-    lv_obj_add_style(timeText, &style_tempC, 0);
+    // date
+    dateText = lv_label_create(screen);
+    static lv_style_t style_date;
+    lv_label_set_text(dateText, "xx-xx-xx");
+    lv_style_init(&style_date);
+    lv_style_set_text_font(&style_date, &RobotoCondensedVariableFont_wght42);
+    lv_obj_align(dateText, LV_ALIGN_TOP_MID, 0, ROW3);
+    lv_obj_add_style(dateText, &style_date, 0);
+
 
     // Create an animation to update with the latest temperature value every 10
     // seconds
@@ -505,6 +483,7 @@ void setup_display() {
     screens[SCR_GNSS] = createGnssScreen();
     screens[SCR_ENV] = createEnvScreen();
     screens[SCR_SYSINFO] = createSysInfoScreen();
+    screens[SCR_THERMOMETER] = createThermometer();
 
     lv_scr_load(screens[SCR_THERMOMETER]);
 }
