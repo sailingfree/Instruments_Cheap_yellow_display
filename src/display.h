@@ -19,6 +19,7 @@
 #define BAR_ROW_TOP     (0)
 #define BAR_ROW_BOTTOM  (TFT_HEIGHT - BAR_MENU_HEIGHT)
 #define BODY_HEIGHT     (TFT_HEIGHT - BAR_HEIGHT - BAR_MENU_HEIGHT)
+#define BODY_WIDTH      (TFT_WIDTH)
 #define IND_HEIGHT      (BODY_HEIGHT / 3)
 #define IND_WIDTH       (TFT_WIDTH / 2)
 #define ROW1            (BAR_HEIGHT)
@@ -45,6 +46,7 @@ typedef enum {
     SCR_NETWORK,
     SCR_SYSINFO,
     SCR_MSGS,
+    SCR_THERMOMETER,
     SCR_MAX
 } Screens;
 

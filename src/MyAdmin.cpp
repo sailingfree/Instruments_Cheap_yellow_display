@@ -29,6 +29,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <GwTelnet.h>
 #include <MyWiFi.h>
 #include "esp_mac.h"
+#include <sensors.h>
 
 // Global objects and variables
 String host_name;
@@ -65,9 +66,14 @@ void adminSetup(void) {
     // Init the shell
     initGwShell();
     setShellSource(&Serial);
+
+    // Init sensors
+    sensorsSetup();
 }
 
 void adminWork() {
+    // Get sensor data
+    sensorsWork();
     if (WiFi.status() == WL_CONNECTED) {
         // handle any telnet sessions
         handleTelnet();
