@@ -213,6 +213,7 @@ void printLocalTime(){
     Serial.println("Failed to obtain time");
     return;
   }
+#if WIFI_DEBUG
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
   Serial.print("Day of week: ");
   Serial.println(&timeinfo, "%A");
@@ -239,6 +240,7 @@ void printLocalTime(){
   strftime(timeWeekDay,10, "%A", &timeinfo);
   Serial.println(timeWeekDay);
   Serial.println();
+#endif
 }
 
 // Read the YD data, decode the N2K messages
