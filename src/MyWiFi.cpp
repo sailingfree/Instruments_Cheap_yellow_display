@@ -71,6 +71,12 @@ WiFiClient telnetClient;
 // Try all the configured APs
 static bool hadconnection = false;
 
+// NTP variables
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 0;
+const int   daylightOffset_sec = 3600;
+
+
 bool connectWifi() {
     int wifi_retry = 0;
 
@@ -201,12 +207,55 @@ void wifiSetup(String& host_name) {
     }
 }
 
+void printLocalTime(){
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  Serial.print("Day of week: ");
+  Serial.println(&timeinfo, "%A");
+  Serial.print("Month: ");
+  Serial.println(&timeinfo, "%B");
+  Serial.print("Day of Month: ");
+  Serial.println(&timeinfo, "%d");
+  Serial.print("Year: ");
+  Serial.println(&timeinfo, "%Y");
+  Serial.print("Hour: ");
+  Serial.println(&timeinfo, "%H");
+  Serial.print("Hour (12 hour format): ");
+  Serial.println(&timeinfo, "%I");
+  Serial.print("Minute: ");
+  Serial.println(&timeinfo, "%M");
+  Serial.print("Second: ");
+  Serial.println(&timeinfo, "%S");
+
+  Serial.println("Time variables");
+  char timeHour[3];
+  strftime(timeHour,3, "%H", &timeinfo);
+  Serial.println(timeHour);
+  char timeWeekDay[10];
+  strftime(timeWeekDay,10, "%A", &timeinfo);
+  Serial.println(timeWeekDay);
+  Serial.println();
+}
+
 // Read the YD data, decode the N2K messages
 // and update the screen copies.
 void wifiWork(void) {
     tN2kMsg msg;
+    static time_t last = 0;
+    time_t now = millis();
 
     if (WiFi.status() == WL_CONNECTED) {
+        // Update time every 10 secs using NTP if available
+        if(now - last > 10000) {
+            last = now;
+            configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+            printLocalTime();
+        }
+
         while (ydtoN2kUDP.readYD(msg)) {
             N2kMsgMap[msg.PGN]++;
             handlePGN(msg);
