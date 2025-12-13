@@ -265,7 +265,7 @@ static void setupMenu(lv_obj_t* screen) {
     MenuBar* menuBar = new MenuBar(screen, BAR_ROW_BOTTOM);
     menuBar->addButton("Eng", SCR_ENGINE);
     menuBar->addButton("Nav", SCR_NAV);
-    menuBar->addButton("GPS", SCR_GNSS);
+    menuBar->addButton("Time", SCR_THERMOMETER);
     menuBar->addButton("Env", SCR_ENV);
     menuBar->addButton("Info", SCR_SYSINFO);
 }
@@ -332,24 +332,6 @@ lv_obj_t* createEnvScreen() {
     return screen;
 
 }
-
-lv_obj_t* createGnssScreen() {
-    lv_obj_t* screen = lv_obj_create(NULL);
-
-    setupCommonstyles(screen);
-    setupHeader(SCR_GNSS, screen, "GPS");
-
-    ind[SCR_GNSS][GNSS_HDOP] = new Indicator(screen, "HDOP", COL1, ROW1);
-    ind[SCR_GNSS][GNSS_SATS] = new Indicator(screen, "Sats", COL2, ROW1);
-    ind[SCR_GNSS][GNSS_LAT] = new Indicator(screen, "LAT", COL1, ROW2);
-    ind[SCR_GNSS][GNSS_LON] = new Indicator(screen, "LON", COL2, ROW2);
-    ind[SCR_GNSS][GNSS_SOG] = new Indicator(screen, "SOG Kts", COL1, ROW3);
-    ind[SCR_GNSS][GNSS_COG] = new Indicator(screen, "COG deg", COL2, ROW3);
-
-    setupMenu(screen);
-    return screen;
-}
-
 
 lv_obj_t* createSysInfoScreen() {
     lv_obj_t* screen = lv_obj_create(NULL);
@@ -480,27 +462,11 @@ void setup_display() {
     // Create the screens
     screens[SCR_ENGINE] = createEngineScreen();
     screens[SCR_NAV] = createNavScreen();
-    screens[SCR_GNSS] = createGnssScreen();
     screens[SCR_ENV] = createEnvScreen();
     screens[SCR_SYSINFO] = createSysInfoScreen();
     screens[SCR_THERMOMETER] = createThermometer();
 
     lv_scr_load(screens[SCR_THERMOMETER]);
-}
-
-// Update a value using double and optional units
-void display_write(MeterIdx obj, double value, const char* units, uint32_t prec) {
-    ind[SCR_GNSS][obj]->setValue(value, units, prec);
-}
-
-// Update using a pre-formatted char *
-void display_write(MeterIdx obj, const char* value) {
-    ind[SCR_GNSS][obj]->setValue(value);
-}
-
-// Upadte the time on the screen
-void updateTime(StringStream t) {
-    bars[SCR_GNSS]->setTime(t.data.c_str());
 }
 
 // Update the meters. Called regularly from the main loop/task
@@ -555,7 +521,6 @@ void refreshSysinfo() {
 
 // Update the time displayed on the screen.
 // Uses the internal system time which will have been updated
-// if the GPS has provided a clock.
 // Only update if the seconds have changed
 void updateTime() {
     static time_t last = 0;
@@ -567,10 +532,8 @@ void updateTime() {
     if (now > last) {
         last = now;
         snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
-        setMeter(SCR_GNSS, GNSS_TIME, buf);
         bars[SCR_ENGINE]->setTime(buf);
         bars[SCR_NAV]->setTime(buf);
-        bars[SCR_GNSS]->setTime(buf);
         bars[SCR_ENV]->setTime(buf);
         bars[SCR_SYSINFO]->setTime(buf);
     }

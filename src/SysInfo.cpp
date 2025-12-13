@@ -62,7 +62,7 @@ void getSysInfo(Stream &s) {
 
     s.println("=========== SYSTEM ==========");
     systemInfo(s);
-    s.printf("Flash used %ld%%\n", flashUsedPc);
+    s.printf("Flash used %d%%\n", flashUsedPc);
     s.println("=========== BUILD ==========");
     s.printf("Build version %s\n", VERSION);
     s.printf("Build date: %s\n", BUILD_TIMESTAMP);

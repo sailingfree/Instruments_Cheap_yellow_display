@@ -41,7 +41,6 @@ typedef enum {
     SCR_BOOT,
     SCR_ENGINE,
     SCR_NAV,
-    SCR_GNSS,
     SCR_ENV,
     SCR_NETWORK,
     SCR_SYSINFO,
@@ -60,15 +59,6 @@ typedef enum {
     NAV_SOG = 0,
     DEPTH = 1,
     NAV_COG = 2,
-
-    // Indexes for the GNSS screen
-    GNSS_SATS = 0,
-    GNSS_HDOP = 1,
-    GNSS_TIME = 2,
-    GNSS_LAT,
-    GNSS_LON,
-    GNSS_SOG,
-    GNSS_COG,
 
     // Environmental
     AIRTEMP = 0,
