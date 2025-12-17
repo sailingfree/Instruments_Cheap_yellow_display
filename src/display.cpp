@@ -380,7 +380,6 @@ static void set_temp(void *text_label_temp_value, int32_t v) {
     lv_label_set_text(timeText, buf);
 
     strftime(buf, sizeof(buf) - 1, "%a %d %b %y", &tm);
-    Serial.printf("%s\n", buf);
     lv_label_set_text(dateText, buf);
 }
 
@@ -388,8 +387,16 @@ static void set_temp(void *text_label_temp_value, int32_t v) {
 lv_obj_t *createThermometer() {
     lv_obj_t *screen = lv_obj_create(NULL);
 
+    // add a background image
+    LV_IMAGE_DECLARE(dawlish);
+    lv_obj_t * img1 = lv_image_create(screen);
+    lv_image_set_src(img1, &dawlish);
+    lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+
     setupCommonstyles(screen);
     setupHeader(SCR_SYSINFO, screen, "Temperature");
+
+
 
     tempTextC = lv_label_create(screen);
     lv_label_set_text(tempTextC, "--.--");
@@ -438,6 +445,7 @@ lv_obj_t *createThermometer() {
     lv_anim_set_repeat_count(&a_temp, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a_temp);
 
+    
     setupMenu(screen);
     return screen;
 }
