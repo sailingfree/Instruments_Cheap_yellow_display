@@ -15,7 +15,7 @@ void partloop(esp_partition_type_t part_type, Stream & stream) {
   while (iterator) {
      next_partition = esp_partition_get(iterator);
      if (next_partition != NULL) {
-        stream.printf("   partition addr: 0x%06lx; size: 0x%06lx (%ld Bytes); label: %s\n", 
+        stream.printf("   partition addr: 0x%06x; size: 0x%06x (%d Bytes); label: %s\n", 
                 next_partition->address, next_partition->size, next_partition->size/(1), next_partition->label);
         total += next_partition->size;
      iterator = esp_partition_next(iterator);
@@ -32,15 +32,15 @@ void ESPinfo(Stream & stream){
     float ESPSketchPercMax  = 100.0f * ESP.getSketchSize() / ESP.getFreeSketchSpace(); // Sketch size in percent of maxpossible sketch size
 
     // code
-    stream.printf("   SketchSize:     %li (0x%lX) (%0.2f%% of Max)\n",    ESP.getSketchSize(), ESP.getSketchSize(), ESPSketchPercMax);
-    stream.printf("   MaxSketchSpace: %li (0x%lX)\n",                     ESP.getFreeSketchSpace(), ESP.getFreeSketchSpace());
+    stream.printf("   SketchSize:     %i (0x%X) (%0.2f%% of Max)\n",    ESP.getSketchSize(), ESP.getSketchSize(), ESPSketchPercMax);
+    stream.printf("   MaxSketchSpace: %i (0x%X)\n",                     ESP.getFreeSketchSpace(), ESP.getFreeSketchSpace());
     stream.printf("   SketchMD5:      %s\n\n",                          ESP.getSketchMD5().c_str());
     stream.printf("   SdkVersion:     %s\n\n",                          ESP.getSdkVersion());
 
 
     // Flash
-    stream.printf("   FlashChipSize:  %li    (0x%lX)\n",                  ESP.getFlashChipSize(), ESP.getFlashChipSize());
-    stream.printf("   FlashChipSpeed: %li\n",                            ESP.getFlashChipSpeed());
+    stream.printf("   FlashChipSize:  %i    (0x%X)\n",                  ESP.getFlashChipSize(), ESP.getFlashChipSize());
+    stream.printf("   FlashChipSpeed: %i\n",                            ESP.getFlashChipSpeed());
     stream.printf("   FlashChipMode:  %i \n\n",                         ESP.getFlashChipMode());
 
     // chip stuff
@@ -48,20 +48,20 @@ void ESPinfo(Stream & stream){
     stream.printf("   ChipModel:      %s\n",                            ESP.getChipModel());
     stream.printf("   ChipCores:      %-7i\n",                          ESP.getChipCores());
     stream.printf("   ChipRevision:   %i\n",                            ESP.getChipRevision());
-    stream.printf("   CpuFreqMHz:     %li\n",                            ESP.getCpuFreqMHz());
-    stream.printf("   CycleCount:     %lu\n\n",                          ESP.getCycleCount());
+    stream.printf("   CpuFreqMHz:     %i\n",                            ESP.getCpuFreqMHz());
+    stream.printf("   CycleCount:     %u\n\n",                          ESP.getCycleCount());
 
     //Internal RAM
-    stream.printf("   HeapSize:       %-7li  (0x%lX)\n",                  ESP.getHeapSize(),      ESP.getHeapSize());
-    stream.printf("   FreeHeap:       %-7li  (0x%lX)\n",                  ESP.getFreeHeap(),      ESP.getFreeHeap());
-    stream.printf("   MinFreeHeap:    %-7li  (0x%lX)\n",                  ESP.getMinFreeHeap(),   ESP.getMinFreeHeap());
-    stream.printf("   MaxAllocHeap:   %-7li  (0x%lX)\n\n",                ESP.getMaxAllocHeap(),  ESP.getMaxAllocHeap());
+    stream.printf("   HeapSize:       %-7i  (0x%X)\n",                  ESP.getHeapSize(),      ESP.getHeapSize());
+    stream.printf("   FreeHeap:       %-7i  (0x%X)\n",                  ESP.getFreeHeap(),      ESP.getFreeHeap());
+    stream.printf("   MinFreeHeap:    %-7i  (0x%X)\n",                  ESP.getMinFreeHeap(),   ESP.getMinFreeHeap());
+    stream.printf("   MaxAllocHeap:   %-7i  (0x%X)\n\n",                ESP.getMaxAllocHeap(),  ESP.getMaxAllocHeap());
 
     // PSRAM
-    stream.printf("   PSRAMSize:       %-7li  (0x%lX)\n",                  ESP.getPsramSize(),      ESP.getPsramSize());
-    stream.printf("   FreePSRAM:       %-7li  (0x%lX)\n",                  ESP.getFreePsram(),      ESP.getFreePsram());
-    stream.printf("   MinFreePSRAM:    %-7li  (0x%lX)\n",                  ESP.getMinFreePsram(),      ESP.getMinFreePsram());
-    stream.printf("   MaxAllocPSRAM:   %-7li  (0x%lX)\n",                  ESP.getMaxAllocPsram(),      ESP.getMaxAllocPsram());
+    stream.printf("   PSRAMSize:       %-7i  (0x%X)\n",                  ESP.getPsramSize(),      ESP.getPsramSize());
+    stream.printf("   FreePSRAM:       %-7i  (0x%X)\n",                  ESP.getFreePsram(),      ESP.getFreePsram());
+    stream.printf("   MinFreePSRAM:    %-7i  (0x%x)\n",                  ESP.getMinFreePsram(),      ESP.getMinFreePsram());
+    stream.printf("   MaxAllocPSRAM:   %-7i  (0x%X)\n",                  ESP.getMaxAllocPsram(),      ESP.getMaxAllocPsram());
 }
 
 

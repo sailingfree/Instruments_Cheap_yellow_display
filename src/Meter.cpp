@@ -18,7 +18,7 @@ Meter::Meter(lv_obj_t* parent, const lv_image_dsc_t* img,
     max = maxVal;
     offset = off;
     sweep = sw;    // Assume end > start
-    Serial.printf("Creating Meter %ld %ld %f %f %f %f\n",
+    Serial.printf("Creating Meter %d %d %f %f %f %f\n",
         w, h, min, max, sweep, offset);
 
     static lv_style_t style;
