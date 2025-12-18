@@ -475,6 +475,9 @@ void setup_display() {
     screens[SCR_THERMOMETER] = createThermometer();
 
     lv_scr_load(screens[SCR_THERMOMETER]);
+
+    // Refresh the screen so it shows at boot up
+    metersWork();
 }
 
 // Update the meters. Called regularly from the main loop/task
