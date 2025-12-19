@@ -429,13 +429,14 @@ lv_obj_t *createThermometer() {
     setupHeader(SCR_THERMOMETER, screen, "Temperature");
 
 
-
+    // Text for the celcius temperature
     tempTextC = lv_label_create(screen);
     lv_label_set_text(tempTextC, "--.--");
     lv_obj_align(tempTextC, LV_ALIGN_TOP_LEFT, 0, ROW1);
     static lv_style_t style_tempC;
     lv_style_init(&style_tempC);
     lv_style_set_text_font(&style_tempC, &RobotoCondensedVariableFont_wght52);
+    lv_style_set_pad_left(&style_tempC, 20);
     lv_obj_add_style(tempTextC, &style_tempC, 0);
 
     // second label for farenheight
@@ -444,6 +445,7 @@ lv_obj_t *createThermometer() {
 
     lv_style_init(&style_tempF);
     lv_style_set_text_font(&style_tempF, &RobotoCondensedVariableFont_wght52);
+    lv_style_set_pad_right(&style_tempF, 20);
     lv_label_set_text(tempTextF, "--.--");
     lv_obj_align(tempTextF, LV_ALIGN_TOP_RIGHT, 0, ROW1);
     lv_obj_add_style(tempTextF, &style_tempF, 0);
