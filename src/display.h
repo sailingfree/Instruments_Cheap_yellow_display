@@ -28,6 +28,7 @@
 #define COL1            (0)
 #define COL2            (TFT_WIDTH / 2)
 
+#define TITLE_LEN  16   // Length of title in title bar
 class Txt {
 public:
     uint16_t x;
@@ -38,15 +39,13 @@ public:
 
 // Define the screens. This is the ordfer they are in at startup
 typedef enum {
-    SCR_BOOT,
     SCR_ENGINE,
     SCR_NAV,
+    SCR_THERMOMETER,    
     SCR_ENV,
-    SCR_NETWORK,
     SCR_SYSINFO,
-    SCR_MSGS,
-    SCR_THERMOMETER,
-    SCR_MAX
+
+    SCR_MAX             // MUST be last
 } Screens;
 
 // Indicator indexes
@@ -114,12 +113,15 @@ public:
     InfoBar(lv_obj_t* parent, uint32_t y);
     void setValue(const char* value);
     void setTime(const char* t);
+    void setWifiState();
 
+    char barTitle[TITLE_LEN];
     bool isActive;
 
     lv_obj_t* container;
     lv_obj_t* text;
     lv_obj_t* curTime;
+    lv_obj_t* wifiState;
 };
 
 

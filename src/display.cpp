@@ -13,6 +13,7 @@
 #include <Meter.h>
 #include <SysInfo.h>
 #include <sensors.h>
+#include <WiFi.h>
 
 static const uint32_t border = 1, padding = 0;
 
@@ -78,9 +79,13 @@ void Indicator::setValue(const char* value) {
 
 // Constructor. Binds to the parent object.
 // Info bar has the screen title and the time
+// and an indication of the wifi status
 InfoBar::InfoBar(lv_obj_t* parent, uint32_t y) {
     static lv_style_t style;
     static lv_style_t value_style;
+
+    // Clear the title space
+    memset(barTitle, 0, sizeof(barTitle));
 
     container = lv_obj_create(parent);
     lv_obj_set_pos(container, 0, y);
@@ -112,10 +117,44 @@ InfoBar::InfoBar(lv_obj_t* parent, uint32_t y) {
     lv_obj_add_style(text, &value_style, 0);
     lv_obj_set_align(text, LV_ALIGN_LEFT_MID);
 
+    //The time on the right
     curTime = lv_label_create(container);
     lv_obj_add_style(curTime, &value_style, 0);
     lv_label_set_text(curTime, "00:00:00");
     lv_obj_set_align(curTime, LV_ALIGN_RIGHT_MID);
+
+    // The Wifi status to the left of the time
+    wifiState = lv_image_create(container);
+    lv_obj_set_align(wifiState, LV_ALIGN_CENTER);
+
+    // set initial state
+    setWifiState();
+}
+
+void InfoBar::setValue(const char* value) {
+    lv_label_set_text(text, value);
+    strncpy(barTitle, value, sizeof(barTitle) - 1);
+}
+
+void InfoBar::setTime(const char* t) {
+    lv_label_set_text(curTime, t);
+    setWifiState();
+}
+
+// Update the wifi state indicator
+void InfoBar::setWifiState() {
+// Images for the wifi state from <a href="https://www.flaticon.com/free-icons/network" title="network icons">Network icons created by Amazona Adorada - Flaticon</a>
+
+    LV_IMAGE_DECLARE(wifiok);
+    LV_IMAGE_DECLARE(wifioff);
+
+    wl_status_t wifiStatus = WiFi.status();
+    
+    if(wifiStatus == WL_CONNECTED) {
+           lv_image_set_src(wifiState, &wifiok);
+    } else {
+           lv_image_set_src(wifiState, &wifioff);
+    }
 }
 
 MenuBar::MenuBar(lv_obj_t* parent, uint32_t y) {
@@ -238,13 +277,6 @@ lv_obj_t* MenuBar::addActionButton(const char* label, void (*ptr)(lv_event_t* e)
     return l;
 }
 
-void InfoBar::setValue(const char* value) {
-    lv_label_set_text(text, value);
-}
-
-void InfoBar::setTime(const char* t) {
-    lv_label_set_text(curTime, t);
-}
 
 static void setupCommonstyles(lv_obj_t* obj) {
     lv_obj_set_style_pad_gap(obj, padding, 0);
@@ -357,7 +389,7 @@ lv_obj_t *tempTextC;
 lv_obj_t *timeText;
 lv_obj_t *dateText;
 
-// Set the temperature value in the arc and text label
+// Set the temperature value in text label
 static void set_temp(void *text_label_temp_value, int32_t v) {
 
 // Get the latest temperature reading in Celsius or Fahrenheit
@@ -394,7 +426,7 @@ lv_obj_t *createThermometer() {
     lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
 
     setupCommonstyles(screen);
-    setupHeader(SCR_SYSINFO, screen, "Temperature");
+    setupHeader(SCR_THERMOMETER, screen, "Temperature");
 
 
 
@@ -545,6 +577,7 @@ void updateTime() {
         snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
         bars[SCR_ENGINE]->setTime(buf);
         bars[SCR_NAV]->setTime(buf);
+        bars[SCR_THERMOMETER]->setTime(buf);
         bars[SCR_ENV]->setTime(buf);
         bars[SCR_SYSINFO]->setTime(buf);
     }
