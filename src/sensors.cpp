@@ -15,6 +15,7 @@ static float temperatureC;
 static float temperatureF;
 
 // Task to read the sensors
+// Discard if the device reports disconnected
 void readSensors(void *parameter) {
     static time_t last = 0;
     while (1) {
@@ -22,11 +23,14 @@ void readSensors(void *parameter) {
 
         if (now - last > TEMPERATURE_PERIOD) {
             last = now;
+            float temp;
             sensors.requestTemperatures();
-            temperatureC = sensors.getTempCByIndex(0);
-            temperatureF = sensors.getTempFByIndex(0);
-        }
-
+            temp = sensors.getTempCByIndex(0);
+            if(temp != DEVICE_DISCONNECTED_C) {
+              temperatureC = temp;
+              temperatureF = sensors.toFahrenheit(temperatureC);
+            }
+          }
         // delay for 1000msecs
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
