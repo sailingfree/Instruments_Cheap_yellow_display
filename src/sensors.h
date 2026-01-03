@@ -1,4 +1,4 @@
-#define TEMPERATURE_PERIOD 10000
+#define TEMPERATURE_PERIOD 1000
 #define TEMP_CELSIUS    1
 
 void sensorsSetup();
