@@ -19,11 +19,16 @@ int TaskLog(int argc, char ** argv) {
     Console->println(statsBuffer);
 
     // Get task list with state, priority, stack, and task number
-    // Note: vTaskList output depends on configuration and may not include core
+    // Note: vTaskList output depends on configuration and may not include Console->
     // affinities by default
-    vTaskList(listBuffer);
     Console->println("Task List:");
+    Console->printf("Blocked ('B'), Ready ('R'), Deleted ('D') or Suspended ('S')\n");
+    Console->println(F("**********************************"));
+    Console->println(F("Task          State   Prio    Stack    PID   Core")); 
+    Console->println(F("**********************************"));
+    vTaskList(listBuffer);
     Console->println(listBuffer);
+    Console->println(F("**********************************"));
 #else
 #warning task stats collection not enabled
 #endif
