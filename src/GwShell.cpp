@@ -29,6 +29,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <SimpleSerialShell.h>
 #include <StringStream.h>
 #include <SysInfo.h>
+#include <taskstats.h>
 #include <map>
 
 
@@ -157,6 +158,7 @@ void initGwShell() {
     shell.addCommand(F("logger \tSet the output logging. (logger on|off)"), logger);
     shell.addCommand(F("reboot \tReboot the ESP"), reboot);
     shell.addCommand(F("msgs \t\tShow the N2K message counts"), messages);
+    shell.addCommand(F("ps \t\tShow task stats"), TaskLog);
 }
 
 // Print a prompt to the terminal
