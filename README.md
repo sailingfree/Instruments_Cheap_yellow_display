@@ -1,1 +1,5 @@
-esp_private/spi_common_internal.h
+Build a custom espidf with these instructions:
+
+https://www.positroid.tech/en/post/platformio-esp32-stats
+
+

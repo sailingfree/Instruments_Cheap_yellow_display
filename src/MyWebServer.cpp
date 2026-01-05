@@ -16,6 +16,10 @@
 // Json library
 #include <ArduinoJson.h>
 
+#include <StreamString.h>
+
+extern Stream * Console;
+
 // The web server
 WebServer server(80);
 
@@ -23,7 +27,7 @@ WebServer server(80);
 void webServerSetup(void) {
     server.begin(80);
     if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("Web server started");
+        Console->println("Web server started");
 
         server.on("/", HTTP_GET, []() {
             server.send(200, "text/html", style +
@@ -70,8 +74,6 @@ void webServerSetup(void) {
 
             server.on("/json", HTTP_GET, []() {
                 JsonDocument doc;
-                char * buffer;
-                size_t doclen;
                 float temp = getTempC();
                 doc["temperature"] = temp;
                 WiFiClient client = server.client();
@@ -85,6 +87,8 @@ void webServerSetup(void) {
 
                 // Write JSON document
                 serializeJsonPretty(doc, client);
+                StreamString str;
+                serializeJsonPretty(doc, str);
 
                 // Disconnect
                 client.stop();
