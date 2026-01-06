@@ -145,6 +145,14 @@ int messages(int argc, char** argv) {
     return 0;
 }
 
+// Get the task stats
+int TaskLog(int argc, char ** argv) {
+    StringStream s;
+    getTaskStats(s);
+    shell.print(s.data);
+    return 0;
+}
+
 // Initialise the shell and add the commands
 // The format of the command is HELP_TEXT<space>CMD
 void initGwShell() {
