@@ -39,7 +39,16 @@ void webServerSetup(void) {
             });
 
         server.on("/temp", HTTP_GET, []() {
-            float temp = getTempC();
+            struct tm tm;
+            char buf[32];
+            time_t now = time(NULL);
+            gmtime_r(&now, &tm);
+
+            snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+            float temprawC = getTempC();
+            float temprawF = getTempF();
+            // Round to nearest 0.5
+            float temp = round((temprawC * 2.0)) / 2.0;
             server.sendHeader("Connection", "close");
             server.send(200, "text/html", style +
                 head_html +
@@ -47,8 +56,17 @@ void webServerSetup(void) {
                 "<h1>System</h1>" +
                 "<h2>" +
                 "Temperature: " +
+                temprawC + 
+                "&#8451;" +
+                " &nbsp " +
                 temp + 
                 "&#8451;" +
+                " &nbsp " +
+                roundf(temprawF * 2.0) / 2.0 + "&#8457;" +
+                "</h2>" +
+                "<h2>" +
+                "Time: " +
+                buf + 
                 "</h2>" +
                 nav +
                 footer_html);
@@ -75,9 +93,12 @@ void webServerSetup(void) {
             server.on("/json", HTTP_GET, []() {
                 JsonDocument doc;
                 float temp = getTempC();
+
+                // Round to 0.5
+                temp = round(temp * 2.0) / 2.0;
                 doc["temperature"] = temp;
                 WiFiClient client = server.client();
-                // Write response headers
+               // Write response headers
                 client.println(F("HTTP/1.0 200 OK"));
                 client.println(F("Content-Type: application/json"));
                 client.println(F("Connection: close"));
