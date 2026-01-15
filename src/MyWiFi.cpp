@@ -27,7 +27,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <GwPrefs.h>
 #include <MyWiFi.h>
 #include <StringStream.h>
-#include <YDtoN2KUDP.h>
+#include <YDtoN2kUDP.h>
 #include <handlePGN.h>
 #include <map>
 #include <SysInfo.h>
