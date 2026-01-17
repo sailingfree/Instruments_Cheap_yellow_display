@@ -5,3 +5,5 @@ void sensorsSetup();
 void sensorsWork();
 float getTempC();
 float getTempF();
+float getHumidity();
+float getPressure();

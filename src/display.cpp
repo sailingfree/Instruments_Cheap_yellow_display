@@ -386,6 +386,8 @@ lv_obj_t* createSysInfoScreen() {
 //lv_obj_t *arc;
 lv_obj_t *tempTextF;
 lv_obj_t *tempTextC;
+lv_obj_t *pressureText;
+lv_obj_t *humidityText;
 lv_obj_t *timeText;
 lv_obj_t *dateText;
 
@@ -395,13 +397,20 @@ static void set_temp(void *text_label_temp_value, int32_t v) {
 // Get the latest temperature reading in Celsius or Fahrenheit
     float ds18b20_tempC = getTempC();
     float ds18b20_tempF = getTempF();
+    float humidity = getHumidity();
+    float pressure = getPressure();
+
     const char degree_symbol[] = "\u00B0";
 
     String ds18b20_temp_textC = String(ds18b20_tempC, 0) + degree_symbol + "C";
     String ds18b20_temp_textF = String(ds18b20_tempF, 0) + degree_symbol + "F";
     String tempText = ds18b20_temp_textC + " " + ds18b20_temp_textF;
+    String humidityString = String(humidity, 0) + "%";
+    String pressureString = String(pressure, 0) + "pa";
     lv_label_set_text(tempTextC, ds18b20_temp_textC.c_str());
     lv_label_set_text(tempTextF, ds18b20_temp_textF.c_str());
+    lv_label_set_text(humidityText, humidityString.c_str());
+    lv_label_set_text(pressureText, pressureString.c_str());
 
     struct tm tm;
     char buf[32];
@@ -422,8 +431,8 @@ lv_obj_t *createThermometer() {
     // add a background image
     LV_IMAGE_DECLARE(dawlish);
     lv_obj_t * img1 = lv_image_create(screen);
-    lv_image_set_src(img1, &dawlish);
-    lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
+//    lv_image_set_src(img1, &dawlish);
+//    lv_obj_align(img1, LV_ALIGN_CENTER, 0, 0);
 
     setupCommonstyles(screen);
     setupHeader(SCR_THERMOMETER, screen, "Temperature");
@@ -442,7 +451,6 @@ lv_obj_t *createThermometer() {
     // second label for farenheight
     tempTextF = lv_label_create(screen);
     static lv_style_t style_tempF;
-
     lv_style_init(&style_tempF);
     lv_style_set_text_font(&style_tempF, &RobotoCondensedVariableFont_wght52);
     lv_style_set_pad_right(&style_tempF, 20);
@@ -450,13 +458,34 @@ lv_obj_t *createThermometer() {
     lv_obj_align(tempTextF, LV_ALIGN_TOP_RIGHT, 0, ROW1);
     lv_obj_add_style(tempTextF, &style_tempF, 0);
 
+    // Humidity
+    humidityText = lv_label_create(screen);
+    static lv_style_t style_humidity;
+    lv_style_init(&style_humidity);
+    lv_style_set_text_font(&style_humidity, &RobotoCondensedVariableFont_wght32);
+    lv_style_set_pad_right(&style_humidity, 20);
+    lv_label_set_text(humidityText, "--.--");
+    lv_obj_align(humidityText, LV_ALIGN_TOP_LEFT, 0, ROW1 + 60);
+    lv_obj_add_style(humidityText, &style_humidity, 0);
+
+    // Pressure
+    pressureText = lv_label_create(screen);
+    static lv_style_t style_pressure;
+    lv_style_init(&style_pressure);
+    lv_style_set_text_font(&style_pressure, &RobotoCondensedVariableFont_wght32);
+    lv_style_set_pad_right(&style_pressure, 20);
+    lv_label_set_text(pressureText, "--.--");
+    lv_obj_align(pressureText, LV_ALIGN_TOP_LEFT, 0, ROW1 + 85);
+    lv_obj_add_style(pressureText, &style_pressure, 0);
+
+
     // Time
     timeText = lv_label_create(screen);
     static lv_style_t style_time;
     lv_label_set_text(timeText, "00:00:00");
     lv_style_init(&style_time);
     lv_style_set_text_font(&style_time, &RobotoCondensedVariableFont_wght64);
-    lv_obj_align(timeText, LV_ALIGN_TOP_MID, 0, ROW2);
+    lv_obj_align(timeText, LV_ALIGN_TOP_RIGHT, 0, ROW2);
     lv_obj_add_style(timeText, &style_time, 0);
 
     // date
@@ -465,7 +494,7 @@ lv_obj_t *createThermometer() {
     lv_label_set_text(dateText, "xx-xx-xx");
     lv_style_init(&style_date);
     lv_style_set_text_font(&style_date, &RobotoCondensedVariableFont_wght42);
-    lv_obj_align(dateText, LV_ALIGN_TOP_MID, 0, ROW3);
+    lv_obj_align(dateText, LV_ALIGN_TOP_RIGHT, 0, ROW3);
     lv_obj_add_style(dateText, &style_date, 0);
 
 

@@ -53,3 +53,6 @@ cp -r out/tools/sdk/ /mnt/c/Users/peter/.platformio/packages/framework-arduinoes
 
 # Or create a tar file for copying (about 51MB)
 tar cjvf sdk.tar.bz2 out/tools/sdk/
+
+======================================
+BME280 code from here https://github.com/bolderflight/bme280/tree/main
