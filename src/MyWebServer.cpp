@@ -93,10 +93,15 @@ void webServerSetup(void) {
             server.on("/json", HTTP_GET, []() {
                 JsonDocument doc;
                 float temp = getTempC();
+                float pres = getPressure();
+                float humi = getHumidity();
 
                 // Round to 0.5
                 temp = round(temp * 2.0) / 2.0;
                 doc["temperature"] = temp;
+                doc["pressure"] = pres;
+                doc["humidity"] = humi;
+                
                 WiFiClient client = server.client();
                // Write response headers
                 client.println(F("HTTP/1.0 200 OK"));
