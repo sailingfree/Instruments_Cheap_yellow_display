@@ -94,8 +94,8 @@ void webServerSetup(void) {
                 JsonDocument doc;
                 float temp = getTempC();
 
-                // Round to 0.5
-                temp = round(temp * 2.0) / 2.0;
+                // Round to 0.1
+                temp = round(temp * 10.0) / 10.0;
                 doc["temperature"] = temp;
                 WiFiClient client = server.client();
                // Write response headers
