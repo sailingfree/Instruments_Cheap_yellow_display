@@ -14,6 +14,7 @@
 #include <SysInfo.h>
 #include <sensors.h>
 #include <WiFi.h>
+#include <myTime.h>
 
 static const uint32_t border = 1, padding = 0;
 
@@ -405,10 +406,16 @@ static void set_temp(void *text_label_temp_value, int32_t v) {
 
     struct tm tm;
     char buf[32];
+    bool isbst = isBST();
+    int hour; 
     time_t now = time(NULL);
     gmtime_r(&now, &tm);
+    hour = tm.tm_hour;
+    if(isbst) {
+        hour += 1;
+    }
 
-    snprintf(buf, 9, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+    snprintf(buf, 9, "%02d:%02d:%02d", hour, tm.tm_min, tm.tm_sec);
     lv_label_set_text(timeText, buf);
 
     strftime(buf, sizeof(buf) - 1, "%a %d %b %y", &tm);
